@@ -13,6 +13,14 @@
 
     <!-- Fragments Container -->
 
+    <include
+        layout="@layout/content_main"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
 
     <gr.openit.smarthealthwatch.util.CircularFrameLayout
@@ -30,15 +38,6 @@
 
     </gr.openit.smarthealthwatch.util.CircularFrameLayout>
 
-
-    <include
-        layout="@layout/content_main"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
     <!-- Bottom Navigation View -->
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation

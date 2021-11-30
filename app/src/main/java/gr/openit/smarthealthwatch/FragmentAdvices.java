@@ -126,7 +126,7 @@ public class FragmentAdvices extends Fragment {
 
     public void getAdvices(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         //showAdvices(new JSONArray());
 
@@ -136,7 +136,6 @@ public class FragmentAdvices extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             if(jsonArray.length() > 0){
@@ -156,8 +155,6 @@ public class FragmentAdvices extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
         /*                if (error instanceof TimeoutError || error instanceof NoConnectionError) {

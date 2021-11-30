@@ -24,7 +24,7 @@ public class HealthSDKManager {
     {
         if(!GarminHealth.isInitialized())
         {
-            GarminHealth.setLoggingLevel(AbstractGarminHealth.LoggingLevel.VERBOSE);
+            GarminHealth.setLoggingLevel(AbstractGarminHealth.LoggingLevel.DEBUG);
         }
 
         return GarminHealth.initialize(context, context.getString(R.string.companion_license));

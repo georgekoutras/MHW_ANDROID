@@ -151,10 +151,10 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
         //Log.i("testtest",fm.getFragments().toString());
 
 
-
-        root =  inflater.inflate(R.layout.fragment_user_home, container, false);
         mUnityPlayer = ((MainActivity)mContext).getUnityPlayer();
         String firstName = SharedPrefManager.getInstance(mContext).getUser().getFirstName();
+        root =  inflater.inflate(R.layout.fragment_user_home, container, false);
+
         appBar = root.findViewById(R.id.appBarLayout);
         appToolbar = (Toolbar) root.findViewById(R.id.toolbar);
         defaultToolbarTitle = "Γεια σας "+firstName;
@@ -274,7 +274,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
         });*/
 
         unityPanel = root.findViewById(R.id.unity);
-        unityPanel.setTranslationZ(10.0f);
         //fixed The specified child already has a parent error
         if(mUnityPlayer.getParent() != null) {
             ((ViewGroup)mUnityPlayer.getParent()).removeView(mUnityPlayer); // <- fix
@@ -416,7 +415,7 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
 
             @Override
             public void onClick(View v) {
-               getActivity().onBackPressed();
+               ((MainActivity)mContext).onBackPressed();
             }
         });
 
@@ -455,7 +454,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
         unityPanel.setCircle(true);
         //TODO set proper elevation value from configuration
         unityPanel.setElevation(2.0f);
-        unityPanel.setTranslationZ(10.0f);
 
         //Load constraints for the unity view to make it a circle and position it
         ConstraintSet set = new ConstraintSet();
@@ -472,9 +470,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
 
     @SuppressLint("ClickableViewAccessibility")
     public void goToTester(View view) {
-
-        //load main menu fragment
-        loadTester();
         //restore unity size as full screen
         unityPanel.setCircle(false);
         unityPanel.setElevation(0.0f);
@@ -484,11 +479,12 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
         ConstraintSet set = new ConstraintSet();
         ConstraintLayout layout = root.findViewById(R.id.container);
         set.load(mContext, R.layout.unity_square_constraints);
-        layout.findViewById(R.id.unity).setTranslationZ(-1.0f);
-
         TransitionManager.beginDelayedTransition(layout);
         set.applyTo(layout);
 
+
+        //load main menu fragment
+        loadTester();
 
         //make unity non-draggable again
         dragger.setOnTouchListener(null);
@@ -546,14 +542,9 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
     }
 
     public void getUnreadMessages(){
-
-        try {
-            pd = new ProgressDialog((MainActivity) getContext());
-            pd.setMessage(getString(R.string.please_wait));
-            pd.show();
-        }catch (NullPointerException e){
-
-        }
+        pd = new ProgressDialog(mContext);
+        pd.setMessage("Παρακαλώ περιμένετε..");
+        pd.show();
         String primaryUserInfoUrl = URLs.URL_GET_MESSAGES.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
         StringRequest stringRequest = new StringRequest(Request.Method.GET, primaryUserInfoUrl,
                 new Response.Listener<String>() {
@@ -583,15 +574,7 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        try {
-                            if (pd.isShowing()) {
-                                pd.hide();
-                                pd.cancel();
-                            }
-                        }catch (Exception e){
-
-                        }
-
+                        pd.hide();
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -643,8 +626,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -678,8 +659,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
 
                         try {
                             JSONArray jsonArray = new JSONArray(response);
@@ -709,8 +688,6 @@ public class UserHome extends Fragment implements View.OnTouchListener  {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();

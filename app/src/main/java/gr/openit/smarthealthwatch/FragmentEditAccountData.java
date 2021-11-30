@@ -12,14 +12,12 @@ import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,8 +39,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import gr.openit.smarthealthwatch.ui.BluetoothLeService;
-import gr.openit.smarthealthwatch.util.Helpers;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
 import gr.openit.smarthealthwatch.util.URLs;
 import gr.openit.smarthealthwatch.util.User;
@@ -74,7 +70,6 @@ public class FragmentEditAccountData extends Fragment {
     UserHome uh;
     private CoughService coughService;
     Intent gattServiceIntent;
-    ScrollView sv;
 
     public FragmentEditAccountData(Context mContext, String pui, UserHome uh) {
         // Required empty public constructor
@@ -118,27 +113,7 @@ public class FragmentEditAccountData extends Fragment {
         final View root ;
         root = LayoutInflater.from(mContext).inflate(R.layout.fragment_edit_account_data, container, false);
         Button changeData = (Button)root.findViewById(R.id.btn_save_account_data);
-        sv = root.findViewById(R.id.edit_account_scrollview);
 
-        root.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Helpers.hideKeyboard((MainActivity)getContext());
-
-                return false;
-            }
-
-        });
-
-        sv.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Helpers.hideKeyboard((MainActivity)getContext());
-
-                return false;
-            }
-
-        });
 
         if(primaryUserInfo != null) {
             fillInForm(root);
@@ -177,20 +152,20 @@ public class FragmentEditAccountData extends Fragment {
 
                     monitorTypes = new ArrayList<String>();
                     if(hr.isChecked())
-                        monitorTypes.add("HR"); // you can save this as checked somewhere
+                        monitorTypes.add("Παλμοί"); // you can save this as checked somewhere
                     if(pressure.isChecked())
-                        monitorTypes.add("BP"); // you can save this as checked somewhere
+                        monitorTypes.add("Πίεση"); // you can save this as checked somewhere
                     if(pulseox.isChecked())
-                        monitorTypes.add("O2"); // you can save this as checked somewhere
+                        monitorTypes.add("Οξυγόνο"); // you can save this as checked somewhere
                     if(gluce.isChecked())
-                        monitorTypes.add("GLU"); // you can save this as checked somewhere
+                        monitorTypes.add("Σάκχαρο"); // you can save this as checked somewhere
                     if(cough.isChecked())
-                        monitorTypes.add("CGH"); // you can save this as checked somewhere
+                        monitorTypes.add("Βήχας"); // you can save this as checked somewhere
                     if(stress.isChecked())
-                        monitorTypes.add("STR"); // you can save this as checked somewhere
+                        monitorTypes.add("Στρες"); // you can save this as checked somewhere
 
                     pd = new ProgressDialog(mContext);
-                    pd.setMessage(getString(R.string.please_wait));
+                    pd.setMessage("Παρακαλώ περιμένετε..");
                     pd.show();
                     updateUserInfo();
                 }
@@ -227,22 +202,22 @@ public class FragmentEditAccountData extends Fragment {
             if(obj.has("phone")) {
                 telephone.setText(obj.getString("phone"));
             }
-            if(list.contains("HR")){
+            if(list.contains("Παλμοί")){
                 hr.setChecked(true);
             }
-            if(list.contains("O2")){
+            if(list.contains("Οξυγόνο")){
                 pulseox.setChecked(true);
             }
-            if(list.contains("STR")){
+            if(list.contains("Στρες")){
                 stress.setChecked(true);
             }
-            if(list.contains("CGH")){
+            if(list.contains("Βήχας")){
                 cough.setChecked(true);
             }
-            if(list.contains("BP")){
+            if(list.contains("Πίεση")){
                 pressure.setChecked(true);
             }
-            if(list.contains("GLU")){
+            if(list.contains("Σάκχαρο")){
                 gluce.setChecked(true);
             }
 
@@ -255,13 +230,13 @@ public class FragmentEditAccountData extends Fragment {
         final JSONObject body = new JSONObject();
         JSONArray jsArray = new JSONArray(monitorTypes);
         try {
-            body.put("firstName", first_name.getText().toString().trim());
-            body.put("lastName", last_name.getText().toString().trim());
+            body.put("firstName", first_name.getText().toString());
+            body.put("lastName", last_name.getText().toString());
             if(!TextUtils.isEmpty(year.getText().toString().trim())) {
-                body.put("birthYear", Integer.parseInt(year.getText().toString().trim()));
+                body.put("birthYear", Integer.parseInt(year.getText().toString()));
             }
             if(!TextUtils.isEmpty(phone.getText().toString().trim())) {
-                body.put("phone", phone.getText().toString().trim().trim());
+                body.put("phone", phone.getText().toString().trim());
             }
             body.put("monitorTypes",jsArray);
         } catch (JSONException e) {
@@ -275,9 +250,7 @@ public class FragmentEditAccountData extends Fragment {
                         //progressBar.setVisibility(View.GONE);
                         //Toast.makeText(getApplicationContext(), "response "+response, Toast.LENGTH_SHORT).show();
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.data_updated_success), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,"Τα στοιχεία σας ανανεώθηκαν", Toast.LENGTH_LONG).show();
                         Integer year_assigned;
                         User user;
                         if(!TextUtils.isEmpty(year.getText().toString().trim())) {
@@ -322,7 +295,7 @@ public class FragmentEditAccountData extends Fragment {
                                 );
                             }
                         }
-                        if(monitorTypes.contains("CGH")){
+                        if(monitorTypes.contains("Βήχας")){
                             coughService = new CoughService();
                             gattServiceIntent = new Intent(mContext, coughService.getClass());
                             getActivity().startService(gattServiceIntent);
@@ -336,41 +309,6 @@ public class FragmentEditAccountData extends Fragment {
 
                             }
                         }
-                        if(!monitorTypes.contains("HR") && !monitorTypes.contains("O2") ){
-                            GarminCustomService gcService = new GarminCustomService();
-                            gattServiceIntent = new Intent(mContext, gcService.getClass());
-                            gattServiceIntent.putExtra("stop_service",true);
-                            if (isMyServiceRunning(gcService.getClass())) {
-                                getActivity().startService(gattServiceIntent);
-                                getActivity().stopService(gattServiceIntent);
-                            }
-                        }else{
-                            GarminCustomService gcService = new GarminCustomService();
-                            gattServiceIntent = new Intent(mContext, gcService.getClass());
-                            if(monitorTypes.contains("HR")) {
-                                gattServiceIntent.putExtra("hr_enabled", true);
-                            }else{
-                                gattServiceIntent.putExtra("hr_enabled", false);
-                            }
-                            if(monitorTypes.contains("O2")) {
-                                gattServiceIntent.putExtra("pulseox_enabled", true);
-                            }else{
-                                gattServiceIntent.putExtra("pulseox_enabled", false);
-                            }
-                            if (isMyServiceRunning(gcService.getClass())) {
-                                getActivity().startService(gattServiceIntent);
-                            }
-                        }
-
-                        if(!monitorTypes.contains("STR")){
-                            BluetoothLeService ringService = new BluetoothLeService();
-                            gattServiceIntent = new Intent(mContext, ringService.getClass());
-                            gattServiceIntent.putExtra("stop_service",true);
-                            if (isMyServiceRunning(ringService.getClass())) {
-                                getActivity().startService(gattServiceIntent);
-                                getActivity().stopService(gattServiceIntent);
-                            }
-                        }
                         SharedPrefManager.getInstance(mContext).userLogin(user);
                         getFragmentManager().popBackStackImmediate();
                     }
@@ -379,9 +317,7 @@ public class FragmentEditAccountData extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

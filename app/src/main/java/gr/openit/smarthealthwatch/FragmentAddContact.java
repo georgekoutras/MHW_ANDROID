@@ -10,15 +10,12 @@ import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,7 +74,7 @@ public class FragmentAddContact extends Fragment {
     EditText full_name, email;
     ArrayList<String> monitorTypes;
     UserHome uh;
-    ScrollView sv;
+
     public FragmentAddContact(Context mContext,UserHome uh) {
         // Required empty public constructor
         this.mContext = mContext;
@@ -121,7 +118,6 @@ public class FragmentAddContact extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_add_contact, container, false);
-        sv = root.findViewById(R.id.edit_account_scrollview);
         occupation = root.findViewById(R.id.choose_occupation);
         add = root.findViewById(R.id.btn_send_invitation);
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, new ArrayList<String>(Helpers.OCCUPATION_LIST));
@@ -137,35 +133,6 @@ public class FragmentAddContact extends Fragment {
         full_name = root.findViewById(R.id.contact_fullname_value);
         email = root.findViewById(R.id.contact_email_value);
 
-        root.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Helpers.hideKeyboard((MainActivity)getContext());
-
-                return false;
-            }
-
-        });
-
-        sv.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Helpers.hideKeyboard((MainActivity)getContext());
-
-                return false;
-            }
-
-        });
-
-        occupation.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Helpers.hideKeyboard((MainActivity)getContext());
-
-                return false;
-            }
-
-        });
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -193,24 +160,24 @@ public class FragmentAddContact extends Fragment {
 
     private void sendInvitation(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         final JSONObject body = new JSONObject();
 
         int userId = (SharedPrefManager.getInstance(mContext).getUser().getId());
         monitorTypes = new ArrayList<String>();
         if(hr.isChecked())
-            monitorTypes.add("HR"); // you can save this as checked somewhere
+            monitorTypes.add("Παλμοί"); // you can save this as checked somewhere
         if(pressure.isChecked())
-            monitorTypes.add("BP"); // you can save this as checked somewhere
+            monitorTypes.add("Πίεση"); // you can save this as checked somewhere
         if(pulseox.isChecked())
-            monitorTypes.add("O2"); // you can save this as checked somewhere
+            monitorTypes.add("Οξυγόνο"); // you can save this as checked somewhere
         if(gluce.isChecked())
-            monitorTypes.add("GLU"); // you can save this as checked somewhere
+            monitorTypes.add("Σάκχαρο"); // you can save this as checked somewhere
         if(cough.isChecked())
-            monitorTypes.add("CGH"); // you can save this as checked somewhere
+            monitorTypes.add("Βήχας"); // you can save this as checked somewhere
         if(stress.isChecked())
-            monitorTypes.add("STR"); // you can save this as checked somewhere
+            monitorTypes.add("Στρες"); // you can save this as checked somewhere
 
         JSONArray jsArray = new JSONArray(monitorTypes);
 
@@ -230,9 +197,7 @@ public class FragmentAddContact extends Fragment {
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.contact_delete_success), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,"Η πρόσκληση στάλθηκε επιτυχώς", Toast.LENGTH_LONG).show();
                         getFragmentManager().popBackStackImmediate();
 
                     }
@@ -241,9 +206,7 @@ public class FragmentAddContact extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελέγξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

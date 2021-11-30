@@ -86,6 +86,7 @@ public class PairedRingDialogFragment extends Fragment {
     private ScrollView scrollView;
     FragmentManager fm;
     UserHome uh;
+    ProgressDialog pd;
     ArrayList<String> listItems=new ArrayList<String>();
     ArrayList<BluetoothDevice> deviceList=new ArrayList<BluetoothDevice>();
 

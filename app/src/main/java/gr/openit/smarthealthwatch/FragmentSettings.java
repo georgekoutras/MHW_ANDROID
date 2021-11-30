@@ -1,8 +1,8 @@
 package gr.openit.smarthealthwatch;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,18 +22,14 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.basgeekball.awesomevalidation.AwesomeValidation;
 import com.garmin.health.DeviceManager;
 import com.garmin.health.GarminHealth;
-
-import java.util.Set;
 
 import gr.openit.smarthealthwatch.devices.PairedDevicesDialogFragment;
 import gr.openit.smarthealthwatch.devices.PairedRingDialogFragment;
 import gr.openit.smarthealthwatch.ui.BluetoothLeService;
+import gr.openit.smarthealthwatch.util.Alarm;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
-
-import static com.basgeekball.awesomevalidation.ValidationStyle.BASIC;
 
 
 /**
@@ -53,7 +49,6 @@ public class FragmentSettings extends Fragment {
     private UserHome uh;
     private String primaryUserInfo = null;
     ProgressDialog pd;
-    String regExEmpty = "^(?=\\s*\\S).*$";
 
     public FragmentSettings(Context mContext, UserHome u) {
         // Required empty public constructor
@@ -111,9 +106,7 @@ public class FragmentSettings extends Fragment {
                 final EditText editText = (EditText) dialogView.findViewById(R.id.edt_comment);
                 Button button1 = (Button) dialogView.findViewById(R.id.buttonSubmit);
                 Button button2 = (Button) dialogView.findViewById(R.id.buttonCancel);
-
                 editText.setText(String.valueOf(SharedPrefManager.getInstance(mContext).getGlobalInterval()));
-
                 button2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -124,54 +117,37 @@ public class FragmentSettings extends Fragment {
                     @Override
                     public void onClick(View view) {
                         // DO SOMETHINGS
-                        boolean valid;
-                        AwesomeValidation mAwesomeValidation = new AwesomeValidation(BASIC);
-                        mAwesomeValidation.addValidation((Activity) mContext, R.id.edt_comment, regExEmpty, R.string.err_empty);
-                        if(!editText.getText().toString().equals("")){
-                            if(Integer.parseInt(editText.getText().toString()) < 30 || Integer.parseInt(editText.getText().toString()) > 3600 ) {
-                                String errorString = "Αποδεκτές τιμές απο 30 - 3600 δευτερόλεπτα.";
-                                editText.setError(errorString);
-                                valid = false;
-                            }else{
-                                valid = true;
-                                editText.setError(null);
-                            }
-                        }else{
-                            valid = false;
-                            String errorString = "Αποδεκτές τιμές απο 30 - 3600 δευτερόλεπτα.";
-                            editText.setError(errorString);
+                        SharedPrefManager.getInstance(mContext).setGlobalInterval(Integer.parseInt(editText.getText().toString()));
+                        Intent gattServiceIntent;
+                        BluetoothLeService bleService;
+                        bleService = new BluetoothLeService();
+                        gattServiceIntent = new Intent(mContext, bleService.getClass());
+                        gattServiceIntent.putExtra("interval", SharedPrefManager.getInstance(mContext).getGlobalInterval());
+                        if (isMyServiceRunning(bleService.getClass())) {
+                            getActivity().startService(gattServiceIntent);
                         }
-                        if(mAwesomeValidation.validate() && valid) {
-                            SharedPrefManager.getInstance(mContext).setGlobalInterval(Integer.parseInt(editText.getText().toString()));
-                            Intent gattServiceIntent;
-                            BluetoothLeService bleService;
-                            bleService = new BluetoothLeService();
-                            gattServiceIntent = new Intent(mContext, bleService.getClass());
-                            gattServiceIntent.putExtra("interval", SharedPrefManager.getInstance(mContext).getGlobalInterval());
-                            if (isMyServiceRunning(bleService.getClass())) {
-                                getActivity().startService(gattServiceIntent);
+                        Alarm alarm = new Alarm();
+                        alarm.setFragmentActivity(getActivity());
+                        boolean alarmUp = (PendingIntent.getBroadcast(mContext, 0,
+                                new Intent(mContext,Alarm.class),
+                                PendingIntent.FLAG_NO_CREATE) != null);
+
+
+                        if (alarmUp)
+                        {
+                            //Toast.makeText(mContext, "Alarm is active!", Toast.LENGTH_SHORT).show();
+                            if(alarm != null && SharedPrefManager.getInstance(mContext).getGarminDeviceAddress() !=null){
+                                alarm.cancelAlarm(mContext);
+                                try {
+                                    alarm.setAlarm(mContext,SharedPrefManager.getInstance(mContext).getGarminDeviceAddress(),SharedPrefManager.getInstance(mContext).getGlobalInterval());
+                                }catch (Exception e){
+                                    Log.i("alarmError",""+e.getMessage());
+                                }
+
                             }
-                            GarminCustomService gcService;
-                            gcService = new GarminCustomService();
-                            gattServiceIntent = new Intent(mContext, gcService.getClass());
-                            gattServiceIntent.putExtra("interval", SharedPrefManager.getInstance(mContext).getGlobalInterval());
-                            Set<String> monitorTypes = SharedPrefManager.getInstance(mContext).getUser().getMonitorTypes();
-                            if(monitorTypes.contains("HR")) {
-                                gattServiceIntent.putExtra("hr_enabled", true);
-                            }else{
-                                gattServiceIntent.putExtra("hr_enabled", false);
-                            }
-                            if(monitorTypes.contains("O2")) {
-                                gattServiceIntent.putExtra("pulseox_enabled", true);
-                            }else{
-                                gattServiceIntent.putExtra("pulseox_enabled", false);
-                            }
-                            if (isMyServiceRunning(gcService.getClass())) {
-                                getActivity().startService(gattServiceIntent);
-                            }
-                            Toast.makeText(mContext, getString(R.string.interval_set_success), Toast.LENGTH_SHORT).show();
-                            dialogBuilder.dismiss();
                         }
+                        Toast.makeText(mContext,"Ο ρυθμός ανανέωσης δεδομένων αποθηκεύτηκε επιτυχώς.",Toast.LENGTH_SHORT).show();
+                        dialogBuilder.dismiss();
                     }
                 });
 
@@ -185,35 +161,19 @@ public class FragmentSettings extends Fragment {
             @Override
             public void onClick(View v)
             {
-                String[] colors = {getString(R.string.smart_watch),getString(R.string.smart_ring)};
+                String[] colors = {"Έξυπνο ρολόι","Έξυπνο δαχτυλίδι"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                builder.setTitle(getString(R.string.connect_device_ask));
+                builder.setTitle("Τι συσκευή θέλετε να συνδέσετε;");
                 builder.setItems(colors, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Set<String> monitorTypes = SharedPrefManager.getInstance(mContext).getUser().getMonitorTypes();
                         switch (which) {
                             case 0:
-                                if(monitorTypes != null && (monitorTypes.contains("O2") || monitorTypes.contains("HR"))) {
-                                    connectedDevicesTransition();
-                                }else{
-                                    new AlertDialog.Builder(mContext, R.style.LogoutDialog)
-                                            .setMessage(R.string.prompt_enable_hr_pulse)
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setPositiveButton(R.string.button_ok, null).show();
-                                }
+                                connectedDevicesTransition();
                                 break;
                             case 1:
-
-                                if(monitorTypes != null && monitorTypes.contains("STR")) {
-                                    connectRingTransition();
-                                }else{
-                                    new AlertDialog.Builder(mContext, R.style.LogoutDialog)
-                                            .setMessage(R.string.prompt_enable_stress)
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .setPositiveButton(R.string.button_ok, null).show();
-                                }
+                                connectRingTransition();
                                 break;
                         }
                     }
@@ -261,15 +221,6 @@ public class FragmentSettings extends Fragment {
                                     getActivity().stopService(gattServiceIntent);
 
                                 }
-                                GarminCustomService gcService;
-                                gcService = new GarminCustomService();
-                                gattServiceIntent = new Intent(mContext, gcService.getClass());
-                                gattServiceIntent.putExtra("stop_service",true);
-                                if (isMyServiceRunning(gcService.getClass())) {
-                                    getActivity().startService(gattServiceIntent);
-                                    getActivity().stopService(gattServiceIntent);
-
-                                }
                                 SharedPrefManager.getInstance(mContext).logout();
                                 userLogin();
                             }})
@@ -311,15 +262,13 @@ public class FragmentSettings extends Fragment {
         if(GarminHealth.isInitialized()) {
             DeviceManager.getDeviceManager().addPairedStateListener(new MainActivity.SetupListener(mContext));
 
-            PairedDevicesDialogFragment pairedDevicesDialogFragment = new PairedDevicesDialogFragment(mContext,uh);
+            PairedDevicesDialogFragment pairedDevicesDialogFragment = new PairedDevicesDialogFragment(uh);
 
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.addToBackStack(null);
 
             transaction.replace(R.id.main_container, pairedDevicesDialogFragment, pairedDevicesDialogFragment.getTag()).commit();
-        }else{
-            Log.i("GarminHealth","not initialized");
         }
     }
 

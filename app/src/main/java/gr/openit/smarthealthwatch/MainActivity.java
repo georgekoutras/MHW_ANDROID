@@ -3,37 +3,56 @@ package gr.openit.smarthealthwatch;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 
+import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import gr.openit.smarthealthwatch.devices.PairedRingDialogFragment;
+import androidx.viewpager.widget.ViewPager;
 
+import gr.openit.smarthealthwatch.devices.PairedDevicesDialogFragment;
+import gr.openit.smarthealthwatch.devices.PairedRingDialogFragment;
+import gr.openit.smarthealthwatch.ui.BaseGarminHealthActivity;
+import gr.openit.smarthealthwatch.ui.BluetoothLeService;
 import gr.openit.smarthealthwatch.ui.HealthSDKManager;
+import gr.openit.smarthealthwatch.ui.MoodmetricServiceReceiver;
 import gr.openit.smarthealthwatch.ui.UnityPlayerActivity;
+import gr.openit.smarthealthwatch.util.Alarm;
 import gr.openit.smarthealthwatch.util.HttpsTrustManager;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
 import gr.openit.smarthealthwatch.util.URLs;
@@ -51,18 +70,14 @@ import com.garmin.health.GarminHealth;
 import com.garmin.health.GarminHealthInitializationException;
 import com.garmin.health.customlog.DataSource;
 import com.garmin.health.customlog.LoggingStatus;
-import com.garmin.health.customlog.LoggingSyncListener;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.splunk.mint.Mint;
 import com.unity3d.player.UnityPlayer;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 /**
@@ -91,10 +106,9 @@ public class MainActivity extends UnityPlayerActivity
     private static String BROADCAST_PERMISSION_SUFFIX =
             ".permission.RECEIVE_BROADCASTS";
     private static final int REQUEST_COARSE_LOCATION = 1;
+    ProgressDialog pd;
     Boolean auth = true;
-
-    private Timer timer;
-    private TimerTask timerTask;
+    private Alarm alarm;
 
     private static GarminHealthServiceReceiver mReceiver = new GarminHealthServiceReceiver();
 
@@ -117,13 +131,8 @@ public class MainActivity extends UnityPlayerActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         HttpsTrustManager.allowAllSSL();
-
-        Mint.setApplicationEnvironment(Mint.appEnvironmentStaging);
-        Mint.initAndStartSession(this.getApplication(), "af2adc00");
-        
         MhwAudioHubClient.initSSLCertificate(getApplicationContext());
 
         if(savedInstanceState != null)
@@ -171,14 +180,7 @@ public class MainActivity extends UnityPlayerActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //initializeService();
-
-                        if (!GarminHealth.isInitialized()) {
-                            initializeService();
-                        }
-                        //testDownloadData();
-                        userHomeTransition();
-
+                        initializeService();
                     }
                 },
                 new Response.ErrorListener() {
@@ -216,68 +218,6 @@ public class MainActivity extends UnityPlayerActivity
 
         return auth;
     }
-
-    private void testDownloadData(){
-        timer = new Timer();
-        timerTask = new TimerTask() {
-            public void run() {
-                Log.i("garminService","running");
-                if (!GarminHealth.isInitialized()) {
-                    initializeService();
-                    Log.i("healthSDK","not initialized, restarting");
-                }else{
-                    if(SharedPrefManager.getInstance(getApplicationContext()).getGarminDeviceAddress()!= null) {
-                        Log.i("healthSDK", "initialized");
-                        DeviceManager deviceManager = DeviceManager.getDeviceManager();
-                        Device device = deviceManager.getDevice(SharedPrefManager.getInstance(getApplicationContext()).getGarminDeviceAddress());
-                        boolean isLogging = device.isDownloadingLoggedData();
-
-                        if(!isLogging) {
-                            if (device != null) {
-                                device.downloadLoggedData(new LoggingSyncListener() {
-                                    @Override
-                                    public void onSyncProgress(Device device, int progress) {
-                                        Log.i("syncProgress", "" + progress);
-                                    }
-
-                                    @Override
-                                    public void onSyncStarted(Device device) {
-                                        //Toast.makeText(context, "Logging Sync Started", Toast.LENGTH_SHORT).show();
-                                        //setPreference(getApplicationContext(),"syncing",true);
-                                        Log.i("garminSync","started");
-
-                                    }
-
-                                    @Override
-                                    public void onSyncComplete(Device device) {
-                                        //Toast.makeText(context, "Logging Sync Complete", Toast.LENGTH_SHORT).show();
-                                        //setPreference(getApplicationContext(),"syncing",false);
-                                        Log.i("garminSync", "completed");
-                                    }
-
-                                    @Override
-                                    public void onSyncFailed(Device device, Exception e) {
-                    /*Toast.makeText(context, String.format("Logging Sync Failed... [%s]",
-                            e == null ? null : e.getMessage()), Toast.LENGTH_SHORT).show();*/
-                        /*Log.i("garminSyncFailed", String.format("Logging Sync Failed... [%s]",
-                                e == null ? null : e.getMessage()));*/
-                                        //setPreference(getApplicationContext(),"syncing",false);
-
-                                    }
-                                });
-                            } else {
-                                //Toast.makeText(context, "Device is null", Toast.LENGTH_SHORT).show();
-                                Log.i("garminSyncDevice", "device is null");
-                            }
-                        }                    }
-                }
-            }
-        };
-        timer.schedule(timerTask,
-                10*1000,
-                10*1000);
-    }
-
     private void initializeApp(){
         if (!SharedPrefManager.getInstance(getApplicationContext()).isFirstOpen()) {
             //Toast.makeText(getApplicationContext(), "First Open", Toast.LENGTH_SHORT).show();
@@ -298,11 +238,9 @@ public class MainActivity extends UnityPlayerActivity
             }
         }
     }
-
     @Override
     public void onBackPressed() {
 
-        Log.i("backPressed","now");
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         boolean handled = false;
         for(Fragment f : fragmentList) {
@@ -384,19 +322,11 @@ public class MainActivity extends UnityPlayerActivity
                     break;
                 }
             }
-            if(f instanceof HelperFragment) {
-                return;
-            }
         }
         super.onBackPressed();
 
     }
 
-    @Override
-    public boolean  onKeyDown(int keyCode, KeyEvent event){
-        onBackPressed();
-        return true;
-    }
     public void enableBT(){
         new AlertDialog.Builder(this, R.style.LogoutDialog)
                 .setMessage(R.string.enable_bluetooth_ask)
@@ -443,7 +373,6 @@ public class MainActivity extends UnityPlayerActivity
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
         transaction.replace(R.id.main_root,homeFragment); // give your fragment container id in first parameter
-        //transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -456,52 +385,30 @@ public class MainActivity extends UnityPlayerActivity
                 @Override
                 public void onSuccess(@Nullable Boolean result)
                 {
-
                     //findViewById(R.id.loadingPanel).setVisibility(View.GONE);
                     runOnUiThread(() -> {
                         Toast.makeText(getApplicationContext(), "SDK Initialized Successfully", Toast.LENGTH_LONG).show();
-                        //checkAlarmUp();
+                        alarm = new Alarm();
+                        checkAlarmUp();
+                        userHomeTransition();
 
                         //connectedDevicesTransition();
                     });
-                    if(!isMyServiceRunning(GarminCustomService.class)){
-                        Log.i("startingService","garminCustom");
-                        GarminCustomService gcService = new GarminCustomService();
-                        Intent gattServiceIntent = new Intent(getApplicationContext(),gcService.getClass());
-                        gattServiceIntent.putExtra("interval",SharedPrefManager.getInstance(getApplicationContext()).getGlobalInterval());
-                        Set<String> monitorTypes = SharedPrefManager.getInstance(getApplicationContext()).getUser().getMonitorTypes();
-                        if(monitorTypes.contains("HR")) {
-                            gattServiceIntent.putExtra("hr_enabled", true);
-                        }else{
-                            gattServiceIntent.putExtra("hr_enabled", false);
-                        }
-                        if(monitorTypes.contains("O2")) {
-                            gattServiceIntent.putExtra("pulseox_enabled", true);
-                        }else{
-                            gattServiceIntent.putExtra("pulseox_enabled", false);
-                        }
-                        if(SharedPrefManager.getInstance(getApplicationContext()).getGarminDeviceAddress()!=null){
-                            gattServiceIntent.putExtra("device_address",SharedPrefManager.getInstance(getApplicationContext()).getGarminDeviceAddress());
-                        }else{
-                            Log.i("startingCustomGarmin","no garmin device address available");
-                        }
-                        startService(gattServiceIntent);
-                    }
-
 
                 }
 
                 @Override
                 public void onFailure(@NonNull Throwable t)
                 {
-                    //Toast.makeText(getApplicationContext(), "SDK Initializion  Unsuccessful. Restart your device. ", Toast.LENGTH_LONG).show();
-
                     //pd.hide();
                     //Log.e(TAG, "Garmin Health initialization failed.", t);
                     runOnUiThread(() ->
                     {
+
                         Toast.makeText(getApplicationContext(), R.string.initialization_failed, Toast.LENGTH_LONG).show();
-                        initializeService();
+                        Log.e(TAG, "Garmin Health initialization failed.", t);
+
+                        finishAndRemoveTask();
                     });
                 }
             }, Executors.newSingleThreadExecutor());
@@ -516,7 +423,7 @@ public class MainActivity extends UnityPlayerActivity
 
     }
 
-   /* private void checkAlarmUp(){
+    private void checkAlarmUp(){
         boolean alarmUp = (PendingIntent.getBroadcast(this, 0,
                 new Intent(this,Alarm.class),
                 PendingIntent.FLAG_NO_CREATE) != null);
@@ -539,7 +446,7 @@ public class MainActivity extends UnityPlayerActivity
             }
         }
     }
-*/
+
     public void userLogin() {
         Fragment loginFragment = new LoginFragment(this);
         FragmentManager fm = getSupportFragmentManager();
@@ -644,26 +551,27 @@ public class MainActivity extends UnityPlayerActivity
                 }
             }
 
-            Log.i("startingService","garminCustom");
-            GarminCustomService gcService = new GarminCustomService();
-            Intent gattServiceIntent = new Intent(mAppContext,gcService.getClass());
-            gattServiceIntent.putExtra("interval",SharedPrefManager.getInstance(mAppContext).getGlobalInterval());
-            Set<String> monitorTypes = SharedPrefManager.getInstance(mAppContext).getUser().getMonitorTypes();
-            if(monitorTypes.contains("HR")) {
-                gattServiceIntent.putExtra("hr_enabled", true);
-            }else{
-                gattServiceIntent.putExtra("hr_enabled", false);
-            }
-            if(monitorTypes.contains("O2")) {
-                gattServiceIntent.putExtra("pulseox_enabled", true);
-            }else{
-                gattServiceIntent.putExtra("pulseox_enabled", false);
-            }
-            if(SharedPrefManager.getInstance(mAppContext).getGarminDeviceAddress()!=null){
-                gattServiceIntent.putExtra("device_address",SharedPrefManager.getInstance(mAppContext).getGarminDeviceAddress());
-            }
-            mAppContext.startService(gattServiceIntent);
+            boolean alarmUp = (PendingIntent.getBroadcast(mAppContext, 0,
+                    new Intent(mAppContext,Alarm.class),
+                    PendingIntent.FLAG_NO_CREATE) != null);
 
+
+            if (!alarmUp)
+            {
+                Log.i("pairingSuccedd","alarm not up");
+                Alarm alarm;
+                alarm = new Alarm();
+                if(alarm != null && SharedPrefManager.getInstance(mAppContext).getGarminDeviceAddress() !=null){
+                    try {
+                        Log.i("pairingSuccedd","alarm set");
+
+                        alarm.setAlarm(mAppContext,SharedPrefManager.getInstance(mAppContext).getGarminDeviceAddress(),SharedPrefManager.getInstance(mAppContext).getGlobalInterval());
+                    }catch (Exception e){
+                        Log.i("alarmError",""+e.getMessage());
+                    }
+
+                }
+            }
         }
 
         @Override
@@ -703,11 +611,7 @@ public class MainActivity extends UnityPlayerActivity
         Log.i ("isMyServiceRunning?", false+"");
         return false;
     }
-
-    public static void setStringDataFromUnity(String string) {
-        Log.d("MHWSample", "Message received from Unity: " + string);
-    }
-/*    @Override
+    @Override
     protected void onStart() {
         if (GarminHealth.isInitialized()) {
             GarminHealth.restart();
@@ -730,6 +634,6 @@ public class MainActivity extends UnityPlayerActivity
         unregisterReceiver(mReceiver);
 
         super.onStop();
-    }*/
+    }
 
 }

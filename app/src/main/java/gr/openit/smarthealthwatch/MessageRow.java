@@ -10,13 +10,11 @@ public class MessageRow {
     Boolean read;
     JSONObject data;
     Boolean isMessage;
-    String preview;
-    public MessageRow(String id,String sender, String date, String preview, Boolean read, JSONObject data, Boolean isMessage) {
+    public MessageRow(String id,String sender, String date, Boolean read, JSONObject data, Boolean isMessage) {
         this.id = id;
         this.sender = sender;
         this.date = date;
         this.read = read;
-        this.preview = preview;
         this.data = data;
         this.isMessage = isMessage;
     }
@@ -34,8 +32,6 @@ public class MessageRow {
     public Boolean getRead() { return read; }
 
     public JSONObject getData() { return data; }
-
-    public String getPreview() { return preview; }
 
     public boolean isMessage() { return isMessage; }
 }

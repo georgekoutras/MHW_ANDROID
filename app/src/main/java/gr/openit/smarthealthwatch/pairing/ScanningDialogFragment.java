@@ -66,7 +66,7 @@ public class ScanningDialogFragment extends BaseFragment
 
     private View mRootView;
     UserHome uh;
-    Switch mScanSwitch;
+
     public ScanningDialogFragment( UserHome uh) {
         // Required empty public constructor
         this.uh = uh;
@@ -100,7 +100,7 @@ public class ScanningDialogFragment extends BaseFragment
         });
 
         // listens to the switch action
-        mScanSwitch = mRootView.findViewById(R.id.scan_switch);
+        Switch mScanSwitch = mRootView.findViewById(R.id.scan_switch);
 
         mScanSwitch.setOnCheckedChangeListener((compoundButton, checked) ->
         {
@@ -169,14 +169,11 @@ public class ScanningDialogFragment extends BaseFragment
 
                         }})
                     .setNegativeButton(R.string.button_no_gr, null).show();
-            mScanSwitch.setChecked(false);
-
         }
         else
         {
-            Log.i("startedScanningGarmin","true");
             mListAdapter.open();
-            mScanSwitch.setChecked(true);
+
             mScanProgressBar.setVisibility(View.VISIBLE);
             mScanProgressBarAnimator.start();
             mScanText.setText(getString(R.string.scan_on));
@@ -232,7 +229,7 @@ public class ScanningDialogFragment extends BaseFragment
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
-        transaction.replace(R.id.main_container, pairingFragment, pairingFragment.getTag()).addToBackStack(getTag()).commit();
+        transaction.replace(R.id.main_root, pairingFragment, pairingFragment.getTag()).addToBackStack(getTag()).commit();
     }
 
     private GarminDeviceScanner callback = new GarminDeviceScanner()

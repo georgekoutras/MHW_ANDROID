@@ -181,7 +181,7 @@ public class FragmentShowInvitation extends Fragment {
 
     private void deleteInvitation(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         String primaryUserInfoUrl = URLs.URL_DELETE_INVITATION.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
         primaryUserInfoUrl = primaryUserInfoUrl.replace("{invitation_id}",String.valueOf(invitation_id));
@@ -191,9 +191,7 @@ public class FragmentShowInvitation extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.invitation_delete_success),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,"Το αίτημα διαγράφηκε επιτυχώς",Toast.LENGTH_SHORT).show();
                         getFragmentManager().popBackStackImmediate();
                     }
                 },
@@ -201,9 +199,7 @@ public class FragmentShowInvitation extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError "+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                         //Toast.makeText(mContext, ""+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -236,8 +232,6 @@ public class FragmentShowInvitation extends Fragment {
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         pd.hide();
-                        pd.cancel();
-
                         if(accept) {
                             Toast.makeText(mContext, "Προστέθηκε στις επαφές σας.", Toast.LENGTH_LONG).show();
                         }else{
@@ -252,9 +246,7 @@ public class FragmentShowInvitation extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -285,7 +277,7 @@ public class FragmentShowInvitation extends Fragment {
 
     private void getInvitationData(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_INVITATION_DETAILS.replace("{id}", String.valueOf(SharedPrefManager.getInstance(mContext).getUser().getId()));
@@ -295,8 +287,6 @@ public class FragmentShowInvitation extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             invitationData = new JSONObject(response);
                             showInvitation(invitationData);
@@ -309,8 +299,6 @@ public class FragmentShowInvitation extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -365,22 +353,22 @@ public class FragmentShowInvitation extends Fragment {
             for(int i=0; i <monitorTypes.length(); i++) {
                 list.add(monitorTypes.getString(i));
             }
-            if(list.contains("HR")){
+            if(list.contains("Παλμοί")){
                 hr.setVisibility(View.VISIBLE);
             }
-            if(list.contains("O2")){
+            if(list.contains("Οξυγόνο")){
                 pulseox.setVisibility(View.VISIBLE);
             }
-            if(list.contains("STR")){
+            if(list.contains("Στρες")){
                 stress.setVisibility(View.VISIBLE);
             }
-            if(list.contains("CGH")){
+            if(list.contains("Βήχας")){
                 cough.setVisibility(View.VISIBLE);
             }
-            if(list.contains("BP")){
+            if(list.contains("Πίεση")){
                 pressure.setVisibility(View.VISIBLE);
             }
-            if(list.contains("GLU")){
+            if(list.contains("Σάκχαρο")){
                 gluce.setVisibility(View.VISIBLE);
             }
         } catch (JSONException e) {
@@ -409,7 +397,7 @@ public class FragmentShowInvitation extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                     }
                 }
 

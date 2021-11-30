@@ -116,7 +116,7 @@ public class FragmentShowAdvice extends Fragment {
 
     private void getAdviceData(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_ADVICE_DETAILS.replace("{id}", this.advice_id);
@@ -125,8 +125,6 @@ public class FragmentShowAdvice extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             adviceData = new JSONObject(response);
                             showAdvice(adviceData);
@@ -139,8 +137,6 @@ public class FragmentShowAdvice extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();

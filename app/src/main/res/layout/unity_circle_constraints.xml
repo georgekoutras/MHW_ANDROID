@@ -10,8 +10,6 @@
     <include layout="@layout/appbar_layout"/>
 
     <gr.openit.smarthealthwatch.util.CircularFrameLayout
-        android:translationZ="10dp"
-
         android:id="@+id/unity"
         android:layout_width="80dp"
         android:layout_height="80dp"

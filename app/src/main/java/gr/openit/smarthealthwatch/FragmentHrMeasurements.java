@@ -81,13 +81,11 @@ public class FragmentHrMeasurements extends Fragment {
     View root;
     DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     DateFormat onlyTime = new SimpleDateFormat("HH:mm");
-    UserHome uh;
 
-    public FragmentHrMeasurements(Context mContext, FragmentMeasurements fm,String displayDate, UserHome uh) {
+    public FragmentHrMeasurements(Context mContext, FragmentMeasurements fm,String displayDate) {
         this.mContext = mContext;
         this.fm = fm;
         this.displayDate = displayDate;
-        this.uh = uh;
         // Required empty public constructor
     }
 
@@ -101,7 +99,7 @@ public class FragmentHrMeasurements extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static FragmentHrMeasurements newInstance(String param1, String param2) {
-        FragmentHrMeasurements fragment = new FragmentHrMeasurements(null,null,null,null);
+        FragmentHrMeasurements fragment = new FragmentHrMeasurements(null,null,null);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -122,7 +120,6 @@ public class FragmentHrMeasurements extends Fragment {
     public void onResume(){
         super.onResume();
         getMeasurements();
-        this.uh.showUnity();
     }
 
     @Override
@@ -257,7 +254,7 @@ public class FragmentHrMeasurements extends Fragment {
 
     public void getMeasurements(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+startTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
         DateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+endTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -266,14 +263,12 @@ public class FragmentHrMeasurements extends Fragment {
             String endForQuery = endDateFormat.format(dateFormat.parse(displayDate));
 
             String primaryUserInfoUrl = URLs.URL_GET_MEASUREMENT.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
-            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"HR";
+            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"Παλμοί";
             StringRequest stringRequest = new StringRequest(Request.Method.GET, primaryUserInfoUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             pd.hide();
-                            pd.cancel();
-
                             try {
                                 JSONArray jsonArray = new JSONArray(response);
                                 if(jsonArray.length() > 0){
@@ -294,8 +289,6 @@ public class FragmentHrMeasurements extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             pd.hide();
-                            pd.cancel();
-
                             SharedPrefManager.getInstance(mContext).logout();
                             userLogin();
                             //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -409,7 +402,7 @@ public class FragmentHrMeasurements extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (type.equals("HR")) {
+                if (type.equals("Παλμοί")) {
                     break;
                 }
             }

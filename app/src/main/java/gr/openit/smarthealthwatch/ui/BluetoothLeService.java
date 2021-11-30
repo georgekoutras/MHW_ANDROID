@@ -295,7 +295,7 @@ public class BluetoothLeService extends Service  {
             String s = String.format("%d",mm);
             //currentValue = s;
             valuesList.add(s);
-            //Log.i("ringData","value: "+s+" status: "+status+" "+" instant: "+instant);
+            Log.i("ringData","value: "+s+" status: "+status+" "+" instant: "+instant);
         }
     };
 
@@ -315,7 +315,7 @@ public class BluetoothLeService extends Service  {
         String nowAsISO = df.format(new Date());
 
         try {
-            body.put("name", "STR");
+            body.put("name", "Στρες");
             body.put("value", Integer.parseInt(value));
             body.put("timeStamp", nowAsISO);
 

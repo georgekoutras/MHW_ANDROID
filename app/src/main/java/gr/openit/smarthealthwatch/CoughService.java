@@ -37,10 +37,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -126,7 +124,6 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
         }else{
             stopTimerTask();
             stopRecording();
-            this.userStoppedService = false;
         }
         super.onDestroy();
 
@@ -207,6 +204,10 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
                 recorder = null;
                 recording = false;
 
+/*            File f = new File(filepath);
+            int file_size = Integer.parseInt(String.valueOf(f.length()/1024));
+            Log.i("fileSize",file_size+"");*/
+               // Log.i("fileSize", filepath);
                 HttpsTrustManager.allowAllSSL();
                 sendExecuteJobRequest(filepath, recStartTimestamp);
 
@@ -300,11 +301,11 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
                 JSONObject coughDetails = coughs.getJSONObject(i);
                 totalCough += coughDetails.getInt("coughs_n");
             }
-            storeCough(totalCough,resultJson);
+            storeCough(totalCough);
         }
     }
 
-    public void storeCough(Integer value,JSONObject resultJson){
+    public void storeCough(Integer value){
         final JSONObject body = new JSONObject();
         TimeZone tz = TimeZone.getDefault();
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -312,7 +313,7 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
         String nowAsISO = df.format(new Date());
 
         try {
-            body.put("name", "CGH");
+            body.put("name", "Βήχας");
             body.put("value",value);
             body.put("timeStamp", nowAsISO);
 
@@ -328,11 +329,6 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         //Log.i("storeCough","done");
-                        try {
-                            sendCoughData(resultJson);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -341,73 +337,6 @@ public class CoughService extends Service implements MhwAudioHubClient.MhwAudioH
                         if(error.networkResponse.statusCode == 401 || error.networkResponse.statusCode == 403) {
                             stopRecording();
                             stopTimerTask();
-                        }
-                    }
-                }
-
-
-        ) {
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return body.toString().getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Accept", "application/json");
-                headers.put("Authorization", "Bearer " + SharedPrefManager.getInstance(getApplicationContext()).getKeyAccessToken());
-                return headers;
-            }
-        };
-        stringRequest.setShouldCache(false);
-
-        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
-    }
-
-    private void sendCoughData(JSONObject resultJson) throws JSONException {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS"); // Quoted "Z" to indicate UTC, no timezone offset
-        JSONObject result = resultJson.getJSONObject("result");
-        JSONArray coughs = result.getJSONArray("coughs");
-        String creationTimestamp = resultJson.getString("creation_timestamp");
-        String formattedCreationTimestamp = null;
-        try {
-            Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(creationTimestamp);
-            formattedCreationTimestamp = df.format(new Date(date1.getTime()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        final JSONObject body = new JSONObject();
-
-        try {
-            body.put("creation_timestamp", formattedCreationTimestamp);
-            body.put("coughs",coughs);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        //Log.i("bodyToSend",body.toString());
-
-        HttpsTrustManager.allowAllSSL();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, (URLs.URL_COUGH_DATA).replace("{id}", "" + SharedPrefManager.getInstance(getApplicationContext()).getUser().getId()),
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //data for cough sent successfully
-                        Log.i("ddd","done");
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if(error.networkResponse.statusCode == 401 || error.networkResponse.statusCode == 403) {
-                            //stopRecording();
-                            //stopTimerTask();
                         }
                     }
                 }

@@ -1,9 +1,10 @@
 package gr.openit.smarthealthwatch;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -32,13 +33,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
+import gr.openit.smarthealthwatch.devices.PairedDevicesDialogFragment;
 import gr.openit.smarthealthwatch.ui.HealthSDKManager;
+import gr.openit.smarthealthwatch.util.Alarm;
 import gr.openit.smarthealthwatch.util.Helpers;
 import gr.openit.smarthealthwatch.util.HttpsTrustManager;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
@@ -61,8 +67,7 @@ public class LoginFragment extends Fragment {
     EditText email, password;
     ProgressDialog pd;
     TextView forgot_password;
-    public static final String GARMIN_DEVICE_ADDRESS = "garmindeviceaddress";
-    private static final String SHARED_PREF_NAME = "garminLoggedInUser";
+    private Alarm alarm;
 
 
     public LoginFragment(Context mContext) {
@@ -114,9 +119,9 @@ public class LoginFragment extends Fragment {
                     email = itemView.findViewById(R.id.login_email);
                     password = itemView.findViewById(R.id.login_password);
                     pd = new ProgressDialog(mContext);
-                    pd.setMessage(getString(R.string.logging_in));
+                    pd.setMessage("Γίνεται σύνδεση. Παρακαλώ περιμένετε..");
                     pd.show();
-                    userLogin(email.getText().toString().trim(), password.getText().toString());
+                    userLogin(email.getText().toString(), password.getText().toString());
                 }
             }
 
@@ -149,13 +154,9 @@ public class LoginFragment extends Fragment {
                     getActivity().runOnUiThread(() -> {
                         //Toast.makeText(mContext, "SDK Initialized Successfully", Toast.LENGTH_LONG).show();
                         pd.hide();
-                        pd.cancel();
-
-                        SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-                        if(sharedPreferences.getString(GARMIN_DEVICE_ADDRESS,null) != null) {
-                            DeviceManager.getDeviceManager().forget(sharedPreferences.getString(GARMIN_DEVICE_ADDRESS, null));
-                            SharedPrefManager.getInstance(getContext()).setGarminDeviceAddress(null);
-                        }
+                        alarm = new Alarm();
+                        alarm.setFragmentActivity(getActivity());
+                        checkAlarmUp();
                         userHomeTransition();
                         //connectedDevicesTransition();
                     });
@@ -171,8 +172,8 @@ public class LoginFragment extends Fragment {
                     {
                         Toast.makeText(mContext, R.string.initialization_failed, Toast.LENGTH_LONG).show();
                         Log.e(TAG, "Garmin Health initialization failed.", t);
-                        initializeService();
-                        //getActivity().finishAndRemoveTask();
+
+                        getActivity().finishAndRemoveTask();
                     });
                 }
             }, Executors.newSingleThreadExecutor());
@@ -184,6 +185,31 @@ public class LoginFragment extends Fragment {
             getActivity().finishAndRemoveTask();
         }
 
+    }
+
+    private void checkAlarmUp(){
+        boolean alarmUp = (PendingIntent.getBroadcast(mContext, 0,
+                new Intent(mContext,Alarm.class),
+                PendingIntent.FLAG_NO_CREATE) != null);
+
+
+        if (alarmUp)
+        {
+            Toast.makeText(mContext, "Alarm is active!", Toast.LENGTH_SHORT).show();
+            //alarm.cancelAlarm(this);
+        }else{
+
+            Toast.makeText(mContext, "Alarm is Inactive!", Toast.LENGTH_SHORT).show();
+            if(alarm != null && SharedPrefManager.getInstance(mContext).getGarminDeviceAddress() !=null){
+                DeviceManager deviceManager = DeviceManager.getDeviceManager();
+                try {
+                    alarm.setAlarm(mContext,SharedPrefManager.getInstance(mContext).getGarminDeviceAddress(),SharedPrefManager.getInstance(mContext).getGlobalInterval());
+                }catch (Exception e){
+                    Log.i("alarmError",""+e.getMessage());
+                }
+
+            }
+        }
     }
 
     private void userLogin(String email, String password) {
@@ -229,9 +255,7 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε πρόβλημα. Παρακαλώ ελέγξτε τα στοιχεία εισόδου σας.", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -279,7 +303,7 @@ public class LoginFragment extends Fragment {
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         //Toast.makeText(getApplicationContext(), "response "+response, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(mContext,getString(R.string.login_successful),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,"Επιτυχής είσοδος.",Toast.LENGTH_SHORT).show();
                         if(response.charAt(0) == '\"' && response.charAt(response.length()-1) == '\"'){
                             response = response.substring( 1, response.length() - 1 );
                         }
@@ -293,9 +317,7 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε πρόβλημα. Παρακαλώ ελέγξτε τα στοιχεία εισόδου σας και την σύνδεση σας στο  διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

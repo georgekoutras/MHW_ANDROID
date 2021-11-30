@@ -20,8 +20,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.garmin.health.settings.Alert;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 public class ListMessagesAdapter extends ArrayAdapter<MessageRow> {
@@ -37,7 +35,6 @@ public class ListMessagesAdapter extends ArrayAdapter<MessageRow> {
         TextView id;
         TextView date;
         TextView data;
-        TextView preview;
     }
 
     public ListMessagesAdapter(ArrayList<MessageRow> data, Context context, UserHome uh, FragmentMessages fm) {
@@ -64,8 +61,6 @@ public class ListMessagesAdapter extends ArrayAdapter<MessageRow> {
             viewHolder.id = (TextView) convertView.findViewById(R.id.message_id);
             viewHolder.date = (TextView) convertView.findViewById(R.id.message_time);
             viewHolder.data = (TextView) convertView.findViewById(R.id.message_data);
-            viewHolder.preview = (TextView) convertView.findViewById(R.id.message_preview);
-
             convertView.setTag(viewHolder);
 
         } else {
@@ -82,7 +77,6 @@ public class ListMessagesAdapter extends ArrayAdapter<MessageRow> {
         viewHolder.id.setText(dataModel.getId());
         viewHolder.date.setText(dataModel.getDate());
         viewHolder.data.setText(dataModel.getData().toString());
-        viewHolder.preview.setText(dataModel.getPreview());
         message_row = convertView.findViewById(R.id.message_layout);
         message_row.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("StringFormatMatches")

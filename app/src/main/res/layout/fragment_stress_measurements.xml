@@ -64,28 +64,10 @@
             android:layout_height="wrap_content"
             >
             <RelativeLayout
-                android:id="@+id/stress_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp">
-                <TextView
-                    android:id="@+id/stress_info_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="italic|bold"
-                    android:text="@string/stress_link"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"/>
-            </RelativeLayout>
-            <RelativeLayout
                 android:id="@+id/stress_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_below="@id/stress_info">
+                android:layout_marginRight="10dp">
                 <RelativeLayout
                     android:id="@+id/stress_icon_set"
                     android:layout_width="wrap_content"
@@ -127,20 +109,18 @@
                 android:textColor="@color/black"
                 android:layout_centerHorizontal="true"
                 android:text="@string/stress_list_heading"
-                android:layout_marginTop="5dp"
                 />
             <RelativeLayout
                 android:id="@+id/stress_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_below="@id/total_stress_title"
-                android:layout_marginBottom="20dp">
+                android:layout_below="@id/total_stress_title">
                 <TextView
                     android:id="@+id/total_stress_data"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"
                     />
@@ -148,7 +128,7 @@
                     android:id="@+id/total_stress_level"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textColor="@color/black"
                     android:layout_marginStart="5dp"
                     android:layout_toRightOf="@id/total_stress_data"
@@ -162,7 +142,7 @@
                 android:layout_alignParentEnd="true"
                 android:background="@drawable/daynight_button"
                 android:backgroundTint="@color/basic_color"
-                android:paddingTop="30sp"
+                android:paddingTop="25sp"
                 android:textOn=""
                 android:textOff="" />
 
@@ -170,9 +150,7 @@
                 android:id="@+id/chart1"
                 android:layout_below="@id/stress_data"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"/>
+                android:layout_height="match_parent" />
 
         </RelativeLayout>
 

@@ -31,7 +31,6 @@ public class URLs {
     public static final String URL_MARKASREAD_INVITATION = ROOT_URL + "PrimaryUser/{id}/Invitations/{invitation_id}";
     public static final String URL_SEND_INVITATION = ROOT_URL + "PrimaryUser/{id}/Invitations";
     public static final String URL_RESET_PASSWORD = ROOT_URL + "PrimaryUser/PasswordReset";
-    public static final String URL_COUGH_DATA = ROOT_URL + "PrimaryUser/{id}/CoughData";
     public static final String MEASUREMENT_TYPE = "measurementType=";
     public static final String START_TIME = "startTime=";
     public static final String END_TIME = "endTime=";

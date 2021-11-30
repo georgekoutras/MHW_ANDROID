@@ -110,7 +110,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            if (type.equals("GLU")) {
+                            if (type.equals("Σάκχαρο")) {
                                 break;
                             }
                         }
@@ -126,7 +126,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            if (type.equals("O2")) {
+                            if (type.equals("Οξυγόνο")) {
                                 break;
                             }
                         }
@@ -141,7 +141,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            if (type.equals("HR")) {
+                            if (type.equals("Παλμοί")) {
                                 break;
                             }
                         }
@@ -155,7 +155,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            if (type.equals("CGH")) {
+                            if (type.equals("Βήχας")) {
                                 break;
                             }
                         }
@@ -239,7 +239,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (type.equals("BP")) {
+                    if (type.equals("Πίεση")) {
                         break;
                     }
                 }
@@ -308,7 +308,7 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
 
     private void deleteMeasurement(String id){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(mContext.getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_DELETE_MEASUREMENT.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId()).replace("{mes_id}",id);
@@ -318,23 +318,15 @@ public class ListViewAdapter extends ArrayAdapter<MeasurementRow> {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,mContext.getString(R.string.measurement_delete_success),Toast.LENGTH_SHORT).show();
-                        if (f instanceof FragmentGluceMeasurements && f.isVisible()) {
-                            ((FragmentGluceMeasurements) f).refresh();
-                        }else if (f instanceof FragmentPresureMeasurements && f.isVisible()) {
-                            ((FragmentPresureMeasurements) f).refresh();
-                        }
+                        Toast.makeText(mContext,"Η μέτρηση διαγράφηκε επιτυχώς",Toast.LENGTH_SHORT).show();
+                        ((FragmentGluceMeasurements)f).refresh();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, mContext.getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
 
                     }
                 }){

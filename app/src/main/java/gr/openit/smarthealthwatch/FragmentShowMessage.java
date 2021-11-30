@@ -153,7 +153,7 @@ public class FragmentShowMessage extends Fragment {
 
     private void deleteMessage(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         String primaryUserInfoUrl = URLs.URL_DELETE_MESSAGE.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
         primaryUserInfoUrl = primaryUserInfoUrl.replace("{message_id}",String.valueOf(message_id));
@@ -163,9 +163,7 @@ public class FragmentShowMessage extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.message_delete_success),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,"Το μήνυμα διαγράφηκε επιτυχώς",Toast.LENGTH_SHORT).show();
                         getFragmentManager().popBackStackImmediate();
                     }
                 },
@@ -173,9 +171,7 @@ public class FragmentShowMessage extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError "+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                         //Toast.makeText(mContext, ""+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -208,30 +204,7 @@ public class FragmentShowMessage extends Fragment {
 
             if(!isMessage) {
                 title.setText(getResources().getString(R.string.message_from, getResources().getString(R.string.smart_device)));
-                String type = message.getString("type");
-                String preview = "";
-                if(type.equals("BP")){
-                    preview += "Πίεση";
-                }else if(type.equals("O2")){
-                    preview += "Οξυγόνο";
-                }else if(type.equals("HR")){
-                    preview += "Παλμοί";
-                }else if(type.equals("GLU")){
-                    preview += "Σάκχαρο";
-                }else if(type.equals("STR")){
-                    preview += "Στρες";
-                }else if(type.equals("CGH")){
-                    preview += "Βήχας";
-                }
-                preview += ": ";
-                if(message.has("value")){
-                    preview += message.getString("value");
-                }
-                if(message.has("extraValue")){
-                    preview += ", "+ message.getString("extraValue");
-                }
-                preview += "\n" + message.getString("note");
-                body.setText(preview);
+                body.setText(message.getString("type") + ": " + message.getInt("value"));
                 String time = message.getString("timeStamp");
                 Date result1 = null;
                 String date1 = null;
@@ -284,7 +257,7 @@ public class FragmentShowMessage extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -320,7 +293,7 @@ public class FragmentShowMessage extends Fragment {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError " + error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                         }
                     }
 

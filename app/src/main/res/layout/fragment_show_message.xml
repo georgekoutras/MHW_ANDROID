@@ -28,47 +28,35 @@
             android:textColor="@color/black"
             android:layout_marginLeft="10dp"
             />
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <LinearLayout
-                    android:id="@+id/text_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/border_shape"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="20dp"
-                    >
-                    <TextView
-                        android:id="@+id/message_body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"
-                        />
-                </LinearLayout>
+            android:background="@drawable/border_shape"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            >
+            <TextView
+                android:id="@+id/message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                />
+        </LinearLayout>
 
-                <Button
-                    android:id="@+id/btn_delete_message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/delete_button"
-                    android:layout_below="@id/text_message"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="30dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:text="@string/delete_message"/>
-            </RelativeLayout>
-        </ScrollView>
+        <Button
+            android:id="@+id/btn_delete_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/delete_button"
+            android:layout_marginTop="30dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:text="@string/delete_message"/>
     </LinearLayout>
 
 </RelativeLayout>

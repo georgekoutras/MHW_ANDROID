@@ -33,7 +33,6 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -148,26 +146,6 @@ public class FragmentAddGluce extends Fragment {
         ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, new ArrayList<String>(Helpers.GLUCE_TYPES));
         type.setAdapter(arrayAdapter2);
 
-        SimpleDateFormat timeF = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String []time = timeF.format(Calendar.getInstance().getTime()).split(":");
-
-        int hourPosition = arrayAdapter.getPosition(time[0]);
-        hour.setSelection(hourPosition);
-
-        if(Integer.parseInt(time[1]) % 5 == 0 ) {
-            int minutePosition = arrayAdapter1.getPosition(time[1]);
-            minutes.setSelection(minutePosition);
-            Log.i("hereee","ee");
-        }else{
-            if(Integer.parseInt(time[1].substring(time[1].length() - 1)) > 5){
-                int minutePosition = arrayAdapter1.getPosition(time[1].substring(0, time[1].length() - 1) + "5");
-                minutes.setSelection(minutePosition);
-            }else {
-                int minutePosition = arrayAdapter1.getPosition(time[1].substring(0, time[1].length() - 1) + "0");
-                minutes.setSelection(minutePosition);
-            }
-        }
-
         DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
             @Override
@@ -246,9 +224,8 @@ public class FragmentAddGluce extends Fragment {
 
                 if(mAwesomeValidation.validate() && valid1 && valid2) {
                     pd = new ProgressDialog(mContext);
-                    pd.setMessage(getString(R.string.please_wait));
+                    pd.setMessage("Παρακαλώ περιμένετε..");
                     pd.show();
-                    Helpers.hideKeyboard((MainActivity)getContext());
                     storeGluce(displayDate,hour.getSelectedItem().toString().trim(),minutes.getSelectedItem().toString().trim(),gluce_value.getText().toString(),type.getSelectedItem().toString().trim());
                 }
             }
@@ -273,7 +250,7 @@ public class FragmentAddGluce extends Fragment {
             String nowAsISO = df.format(new Date(calendar.getTimeInMillis()));
             //if everything is fine
             try {
-                body.put("name", "GLU");
+                body.put("name", "Σάκχαρο");
                 body.put("value", Integer.parseInt(value));
                 body.put("timeStamp", nowAsISO);
                 body.put("note",type);
@@ -292,9 +269,7 @@ public class FragmentAddGluce extends Fragment {
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.measurement_add_success), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,"Η μέτρηση προστέθηκε επιτυχώς", Toast.LENGTH_LONG).show();
                         getFragmentManager().popBackStackImmediate();
 
                     }
@@ -303,9 +278,7 @@ public class FragmentAddGluce extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

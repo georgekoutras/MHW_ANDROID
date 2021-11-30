@@ -136,8 +136,15 @@ public class SharedPrefManager {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
 
         if(sharedPreferences.getString(GARMIN_DEVICE_ADDRESS,null) != null) {
-            //DeviceManager.getDeviceManager().forget(sharedPreferences.getString(GARMIN_DEVICE_ADDRESS, null));
-            //SharedPrefManager.getInstance(mCtx).setGarminDeviceAddress(null);
+            Alarm alarm = new Alarm();
+            DeviceManager.getDeviceManager().forget(sharedPreferences.getString(GARMIN_DEVICE_ADDRESS, null));
+            SharedPrefManager.getInstance(mCtx).setGarminDeviceAddress(null);
+            boolean alarmUp = (PendingIntent.getBroadcast(mCtx, 0,
+                    new Intent(mCtx, Alarm.class),
+                    PendingIntent.FLAG_NO_CREATE) != null);
+            if (alarmUp) {
+                alarm.cancelAlarm(mCtx);
+            }
         }
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
@@ -155,7 +162,7 @@ public class SharedPrefManager {
     public int getGlobalInterval(){
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
 
-        return sharedPreferences.getInt(GLOBAL_INTERVAL,30);
+        return sharedPreferences.getInt(GLOBAL_INTERVAL,10);
     }
 
     public void setGarminDeviceAddress(String address){

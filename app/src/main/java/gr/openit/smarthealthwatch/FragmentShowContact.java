@@ -156,7 +156,7 @@ public class FragmentShowContact extends Fragment {
 
     private void deleteContact(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         String primaryUserInfoUrl = URLs.URL_DELETE_CONTACT.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
         primaryUserInfoUrl = primaryUserInfoUrl.replace("{contact_id}",String.valueOf(contact_id));
@@ -166,9 +166,7 @@ public class FragmentShowContact extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.contact_delete_success),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext,"Η επαφή διαγράφηκε επιτυχώς",Toast.LENGTH_SHORT).show();
                         getFragmentManager().popBackStackImmediate();
                     }
                 },
@@ -176,9 +174,7 @@ public class FragmentShowContact extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.\nError "+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                         //Toast.makeText(mContext, ""+error.networkResponse.statusCode, Toast.LENGTH_LONG).show();
                     }
                 }
@@ -204,7 +200,7 @@ public class FragmentShowContact extends Fragment {
 
     private void getContactData(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_CONTACT_DETAILS.replace("{id}", String.valueOf(SharedPrefManager.getInstance(mContext).getUser().getId()));
@@ -214,8 +210,6 @@ public class FragmentShowContact extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             contactData = new JSONObject(response);
                             showContact(contactData);
@@ -228,8 +222,6 @@ public class FragmentShowContact extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -280,22 +272,22 @@ public class FragmentShowContact extends Fragment {
             for(int i=0; i <monitorTypes.length(); i++) {
                 list.add(monitorTypes.getString(i));
             }
-            if(list.contains("HR")){
+            if(list.contains("Παλμοί")){
                 hr.setChecked(true);
             }
-            if(list.contains("O2")){
+            if(list.contains("Οξυγόνο")){
                 pulseox.setChecked(true);
             }
-            if(list.contains("STR")){
+            if(list.contains("Στρες")){
                 stress.setChecked(true);
             }
-            if(list.contains("CGH")){
+            if(list.contains("Βήχας")){
                 cough.setChecked(true);
             }
-            if(list.contains("BP")){
+            if(list.contains("Πίεση")){
                 pressure.setChecked(true);
             }
-            if(list.contains("GLU")){
+            if(list.contains("Σάκχαρο")){
                 gluce.setChecked(true);
             }
         } catch (JSONException e) {
@@ -305,23 +297,23 @@ public class FragmentShowContact extends Fragment {
 
     public void updateContactInfo(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         final JSONObject body = new JSONObject();
         ArrayList<String> monitorTypes;
         monitorTypes = new ArrayList<String>();
         if(hr.isChecked())
-            monitorTypes.add("HR"); // you can save this as checked somewhere
+            monitorTypes.add("Παλμοί"); // you can save this as checked somewhere
         if(pressure.isChecked())
-            monitorTypes.add("BP"); // you can save this as checked somewhere
+            monitorTypes.add("Πίεση"); // you can save this as checked somewhere
         if(pulseox.isChecked())
-            monitorTypes.add("O2"); // you can save this as checked somewhere
+            monitorTypes.add("Οξυγόνο"); // you can save this as checked somewhere
         if(gluce.isChecked())
-            monitorTypes.add("GLU"); // you can save this as checked somewhere
+            monitorTypes.add("Σάκχαρο"); // you can save this as checked somewhere
         if(cough.isChecked())
-            monitorTypes.add("CGH"); // you can save this as checked somewhere
+            monitorTypes.add("Βήχας"); // you can save this as checked somewhere
         if(stress.isChecked())
-            monitorTypes.add("STR"); // you can save this as checked somewhere
+            monitorTypes.add("Στρες"); // you can save this as checked somewhere
 
         JSONArray jsArray = new JSONArray(monitorTypes);
         try {
@@ -339,9 +331,7 @@ public class FragmentShowContact extends Fragment {
                         //progressBar.setVisibility(View.GONE);
                         //Toast.makeText(getApplicationContext(), "response "+response, Toast.LENGTH_SHORT).show();
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.contact_data_updated_success), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,"Τα στοιχεία της επαφής ανανεώθηκαν", Toast.LENGTH_LONG).show();
                         getFragmentManager().popBackStackImmediate();
                     }
                 },
@@ -349,9 +339,7 @@ public class FragmentShowContact extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

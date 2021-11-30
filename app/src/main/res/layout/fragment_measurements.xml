@@ -71,24 +71,24 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/hr_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:background="@drawable/border_shape"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:clickable="true"
-                android:focusable="true"
-                android:weightSum="1">
+                android:focusable="true">
 
                 <RelativeLayout
                     android:id="@+id/hr_icon_set"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:layout_gravity="center_vertical|center_horizontal">
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_hr"
@@ -108,29 +108,28 @@
 
                 <TextView
                     android:id="@+id/hr_body"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
                     android:layout_toRightOf="@id/hr_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
                     android:id="@+id/hr_body_data"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.7"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/hr_icon_set"
                     android:visibility="gone"
                     android:orientation="horizontal"
                     android:weightSum="1"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
                     >
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.6"
+                        android:layout_weight="0.5"
                         android:orientation="vertical">
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -204,33 +203,32 @@
 
                 <ImageView
                     android:id="@+id/hr_more"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.1"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"/>
 
                 <ImageView
                     android:id="@+id/hr_activate"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.1"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/pulseox_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_below="@id/hr_measurement"
                 android:background="@drawable/border_shape"
                 android:layout_marginLeft="10dp"
@@ -238,15 +236,16 @@
                 android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:weightSum="1"
                 >
 
                 <RelativeLayout
                     android:id="@+id/pulseox_icon_set"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.2"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical">
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_pulseox"
@@ -266,21 +265,21 @@
 
                 <TextView
                     android:id="@+id/pulseox_body"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.7"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/pulseox_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
                     android:id="@+id/pulseox_body_data"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.7"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/pulseox_icon_set"
                     android:visibility="gone"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_vertical">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/pulseox_list_headings"
@@ -358,32 +357,31 @@
 
                 <ImageView
                     android:id="@+id/pulseox_more"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true" />
                 <ImageView
                     android:id="@+id/pulseox_activate"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.1"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/pressure_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_below="@id/pulseox_measurement"
                 android:background="@drawable/border_shape"
                 android:layout_marginLeft="10dp"
@@ -391,15 +389,16 @@
                 android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:weightSum="1"
                 >
 
                 <RelativeLayout
                     android:id="@+id/pressure_icon_set"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:layout_gravity="center_vertical|center_horizontal">
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_pressure"
@@ -419,21 +418,21 @@
 
                 <TextView
                     android:id="@+id/pressure_body"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/pressure_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
                     android:id="@+id/pressure_body_data"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/pressure_icon_set"
                     android:visibility="gone"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_vertical">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/pressure_list_headings"
@@ -511,29 +510,29 @@
 
                 <ImageView
                     android:id="@+id/pressure_more"
-                    android:layout_width="0dp"
-                    android:layout_weight="0.1"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true" />
 
                 <ImageView
                     android:id="@+id/pressure_activate"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/gluce_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -544,17 +543,16 @@
                 android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:orientation="horizontal"
-                android:weightSum="1"
                 >
 
                 <RelativeLayout
                     android:id="@+id/gluce_icon_set"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    >
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_glucometer"
@@ -574,21 +572,21 @@
 
                 <TextView
                     android:id="@+id/gluce_body"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/gluce_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
                     android:id="@+id/gluce_body_data"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/gluce_icon_set"
                     android:visibility="gone"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_vertical">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/gluce_list_headings"
@@ -666,29 +664,29 @@
 
                 <ImageView
                     android:id="@+id/gluce_more"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true" />
 
                 <ImageView
                     android:id="@+id/gluce_activate"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/stress_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -699,17 +697,16 @@
                 android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:orientation="horizontal"
-                android:weightSum="1"
                 >
 
                 <RelativeLayout
                     android:id="@+id/stress_icon_set"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:layout_gravity="center_vertical|clip_horizontal"
-                    >
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_stress"
@@ -729,21 +726,21 @@
 
                 <TextView
                     android:id="@+id/stress_body"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/stress_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <LinearLayout
                     android:id="@+id/stress_body_data"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/stress_icon_set"
                     android:visibility="gone"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_vertical">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:id="@+id/stress_list_headings"
@@ -778,29 +775,29 @@
 
                 <ImageView
                     android:id="@+id/stress_more"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"/>
 
                 <ImageView
                     android:id="@+id/stress_activate"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/cough_measurement"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -811,16 +808,16 @@
                 android:layout_marginTop="5dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:orientation="horizontal"
-                android:weightSum="1"
                 >
 
                 <RelativeLayout
                     android:id="@+id/cough_icon_set"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:layout_gravity="clip_horizontal|center_vertical">
+                    android:minWidth="55dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentStart="true">
 
                     <ImageView
                         android:id="@+id/img_cough"
@@ -841,36 +838,37 @@
 
                 <TextView
                     android:id="@+id/cough_body"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7"
+                    android:layout_toRightOf="@id/cough_icon_set"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"/>
 
                 <ImageView
                     android:id="@+id/cough_more"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
                     android:src="@drawable/ic_baseline_chevron_right_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"/>
 
                 <ImageView
                     android:id="@+id/cough_activate"
-                    android:layout_width="0dp"
+                    android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_baseline_assignment_24"
+                    android:src="@drawable/ic_baseline_add_circle_24"
                     android:tint="@color/basic_color"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
-                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
                     android:visibility="gone"/>
-            </LinearLayout>
+            </RelativeLayout>
         </RelativeLayout>
     </ScrollView>
 </RelativeLayout>

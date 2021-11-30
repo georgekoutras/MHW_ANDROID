@@ -5,7 +5,6 @@ import android.os.Build;
 import android.util.Log;
 
 import gr.openit.smarthealthwatch.CoughService;
-import gr.openit.smarthealthwatch.GarminCustomService;
 
 public class MoodmetricServiceReceiver extends BroadcastReceiver {
 
@@ -24,12 +23,6 @@ public class MoodmetricServiceReceiver extends BroadcastReceiver {
                     context.startForegroundService(new Intent(context, CoughService.class));
                 } else {
                     context.startService(new Intent(context, CoughService.class));
-                }
-            }else if(intent.getAction().equals("restart_service_garmin")){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(new Intent(context, GarminCustomService.class));
-                } else {
-                    context.startService(new Intent(context, GarminCustomService.class));
                 }
             }
         }

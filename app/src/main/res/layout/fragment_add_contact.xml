@@ -3,9 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FragmentMeasurements"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    tools:context=".FragmentMeasurements">
 
     <RelativeLayout
         android:id="@+id/add_contact_heading"
@@ -62,8 +60,6 @@
         android:layout_above="@id/btn_send_invitation"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -114,8 +110,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/et_custom"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 />
             <TextView
                 android:id="@+id/reg2_desc2"

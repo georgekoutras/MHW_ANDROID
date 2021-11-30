@@ -49,6 +49,18 @@ public abstract class UnityPlayerActivity extends AppCompatActivity {
         mUnityPlayer.resume();
     }
 
+    @Override protected void onStart()
+    {
+        super.onStart();
+        mUnityPlayer.start();
+    }
+
+    @Override protected void onStop()
+    {
+        super.onStop();
+        mUnityPlayer.stop();
+    }
+
     // Low Memory Unity
     @Override public void onLowMemory()
     {

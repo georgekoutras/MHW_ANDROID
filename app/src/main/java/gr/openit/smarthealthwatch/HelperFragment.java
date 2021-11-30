@@ -1,36 +1,22 @@
 package gr.openit.smarthealthwatch;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.ImageSpan;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,13 +57,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 import javax.annotation.Nullable;
 
 import gr.openit.smarthealthwatch.util.CircularFrameLayout;
-import gr.openit.smarthealthwatch.util.PaddingBackgroundColorSpan;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
 import gr.openit.smarthealthwatch.util.URLs;
 import gr.openit.smarthealthwatch.util.User;
@@ -109,8 +93,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
     private String filepath;
     private long recStartTimestamp;
     ImageView recStopButton;
-    ImageView helper_exit;
-    ImageView helper_info;
     Button measurements_btn, messages_btn;
     ProgressDialog pd;
     final String startTime = "00:00:00";
@@ -119,12 +101,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
     Calendar cal;
     String displayDate;
     JSONObject stressThres = new JSONObject();
-
-    MediaPlayer start_sound;
-    MediaPlayer stop_sound;
-    String firstName;
-    private final String avatarName = "VirtualAssistant"; // change to name
-
 
     public HelperFragment(Context mContext ,UserHome uh) {
         this.mContext = mContext;
@@ -143,17 +119,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
         uh.hideMenu();
         uh.hideToolbar();
-
-    }
-
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            tts.setLanguage(Locale.US);
-            tts.setSpeechRate(0.7f);
-            UnityPlayer.UnitySendMessage(avatarName, "Animate", "Hello");
-            commandToSpeech(getString(R.string.helper_message,firstName));
-        }
     }
 
     @Override
@@ -169,17 +134,12 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
         displayDate = toShow.format(new Date());
 
         View v = inflater.inflate(R.layout.fragment_helper, container, false);
-        helper_exit = v.findViewById(R.id.helper_exit);
-        helper_info = v.findViewById(R.id.helper_tips);
+        ImageView helper_exit = v.findViewById(R.id.helper_exit);
         message = v.findViewById(R.id.helper_welcome_message);
-        firstName = SharedPrefManager.getInstance(mContext).getUser().getFirstName();
+        String firstName = SharedPrefManager.getInstance(mContext).getUser().getFirstName();
         builder = new AlertDialog.Builder(mContext);
 
-        //message.setText(getString(R.string.helper_message, firstName));
-        //
-        start_sound = MediaPlayer.create(mContext, R.raw.start);
-        stop_sound = MediaPlayer.create(mContext, R.raw.stop);
-
+        message.setText(getString(R.string.helper_message, firstName));
         recStopButton = v.findViewById(R.id.helper_rec);
         recStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +164,8 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
             }
         });
         tts = new TextToSpeech(getActivity(), this);
+        tts.setLanguage(Locale.US);
+        tts.setSpeechRate(0.3f);
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {
@@ -214,13 +176,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                 Log.d("debug", "setOnUtteranceProgressListener onDone");
 
                 try (FileInputStream fileInputStreamReader = new FileInputStream(wavFile)) {
-/*                    byte[] bytes = new byte[(int)wavFile.length()];
+                    byte[] bytes = new byte[(int)wavFile.length()];
                     fileInputStreamReader.read(bytes);
                     String encodedFile = Base64.encodeToString(bytes, Base64.DEFAULT);
                     UnityPlayer.UnitySendMessage("Model", "Speak", encodedFile);
-                    encodedFile = null;*/
-                    UnityPlayer.UnitySendMessage(avatarName, "Speak", wavFile.getAbsolutePath()); //megalo arxeio
-
+                    encodedFile = null;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -239,47 +199,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                 uh.showMenu();
                 uh.showToolbar();
                 uh.goToMainMenu(null);
-                UnityPlayer.UnitySendMessage(avatarName, "Speak", null);
-            }
-
-        });
-
-        helper_info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImageView cancel;
-                //will create a view of our custom dialog layout
-                View alertCustomdialog = LayoutInflater.from(getActivity()).inflate(R.layout.info_dialog,null);
-                //initialize alert builder.
-                AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-
-                //set our custom alert dialog to tha alertdialog builder
-                alert.setView(alertCustomdialog);
-                cancel = (ImageView)alertCustomdialog.findViewById(R.id.cancel_button);
-                final AlertDialog dialog = alert.create();
-                //this line removed app bar from dialog and make it transperent and you see the image is like floating outside dialog box.
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                TextView content1 = alertCustomdialog.findViewById(R.id.content1_text);
-                SpannableStringBuilder ssb = new SpannableStringBuilder();
-                ssb.append(getString(R.string.help_dialog_content1));
-                ssb.append("  ");
-                ssb.setSpan(new ImageSpan(getActivity(),R.drawable.mic_icon),ssb.length()-1,ssb.length(),0);
-                content1.setText(ssb);
-                TextView content3 = alertCustomdialog.findViewById(R.id.content3_text);
-                SpannableStringBuilder ssb3 = new SpannableStringBuilder();
-                ssb3.append(getString(R.string.help_dialog_content3));
-                ssb3.append("  ");
-                ssb3.setSpan(new ImageSpan(getActivity(),R.drawable.stop_icon),ssb3.length()-1,ssb3.length(),0);
-                content3.setText(ssb3);
-                //finally show the dialog box in android all
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
-
             }
 
         });
@@ -302,7 +221,7 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (type.equals("STR")) {
+                if (type.equals("Στρες")) {
                     stressThres = s;
                     break;
                 }
@@ -312,14 +231,10 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
     }
 
     private void onRecStopClick(boolean recording) {
-        if (recording) {
-            stop_sound.start();
+        if (recording)
             stopRecording();
-        }
-        else {
-            start_sound.start();
+        else
             startRecording();
-        }
     }
 
     private void startRecording() {
@@ -331,33 +246,27 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
             return;
         }
 
+        Log.d("recording", "startRecording()");
+        recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setAudioSamplingRate(16000);
+        recorder.setAudioChannels(1);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        filepath = getActivity().getExternalCacheDir().getAbsolutePath()+"/"+System.currentTimeMillis()+".3gp";
+        recorder.setOutputFile(filepath);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        recorder.setAudioEncodingBitRate(128000);
+
         try {
-            Log.d("recording", "startRecording()");
-            recorder = new MediaRecorder();
-            recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            recorder.setAudioSamplingRate(16000);
-            recorder.setAudioChannels(1);
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            filepath = Objects.requireNonNull(getActivity()).getExternalCacheDir().getAbsolutePath()+"/"+System.currentTimeMillis()+".3gp";
-            recorder.setOutputFile(filepath);
-            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-            recorder.setAudioEncodingBitRate(128000);
-
             recorder.prepare();
-
-            recording = true;
-            recStopButton.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_baseline_stop_24));
-            recStopButton.setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.helper_circle_button_clicked));
-
-            recStartTimestamp = System.currentTimeMillis();
-            recorder.start();
         } catch (IOException e) {
             Log.e("recording", "prepare() failed");
-            recStopButton.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_baseline_mic_24));
-            recStopButton.setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.helper_circle_button));
-
-            recording = false;
         }
+
+        recording = true;
+        recStopButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_stop_24));
+        recStartTimestamp = System.currentTimeMillis();
+        recorder.start();
 
     }
 
@@ -369,12 +278,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
             recorder.release();
             recorder = null;
             recording = false;
-            recStopButton.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_baseline_mic_24));
-            recStopButton.setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.helper_circle_button));
+            recStopButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_mic_24));
 
             progressBar = new ProgressDialog(mContext);
             progressBar.setCancelable(false);
-            progressBar.setTitle(getString(R.string.please_wait));
+            progressBar.setTitle("Παρακαλώ περιμένετε..");
             progressBar.show();
 /*            File f = new File(filepath);
             int file_size = Integer.parseInt(String.valueOf(f.length()/1024));
@@ -383,9 +291,7 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
         }catch (Exception e){
             Log.e("stopRecordingException", "recording Exception");
-            recStopButton.setImageDrawable(ContextCompat.getDrawable(getActivity(),R.drawable.ic_baseline_mic_24));
-            recStopButton.setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.helper_circle_button));
-
+            recStopButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_mic_24));
             recording = false;
         }
 
@@ -470,33 +376,33 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
         if(action.equals("unknown")){
             msg = getString(R.string.helper_no_match);
-            //message.setText(msg);
+            message.setText(msg);
             commandToSpeech(msg);
         }else{
             switch (action){
                 case "stress":
-                    getMeasurements("STR",action);
+                    getMeasurements("Στρες",action);
 
                     break;
                 case "pressure":
-                    getMeasurements("BP",action);
+                    getMeasurements("Πίεση",action);
 
                     break;
                 case "bloodsugar":
-                    getMeasurements("GLU",action);
+                    getMeasurements("Σάκχαρο",action);
 
                     break;
                 case "heartrate":
-                    getMeasurements("HR",action);
+                    getMeasurements("Παλμοί",action);
 
                     break;
                 case "cough":
-                    getMeasurements("CGH",action);
+                    getMeasurements("Βήχας",action);
 
 
                     break;
                 case "oxygen":
-                    getMeasurements("O2",action);
+                    getMeasurements("Οξυγόνο",action);
 
                     break;
                 case "measurements":
@@ -546,11 +452,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Στρες");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -575,11 +481,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     }
                     msg = getString(R.string.helper_message_mes,"Πίεση",values);
 
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Πίεση");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -603,11 +509,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     }
                     msg = getString(R.string.helper_message_mes,"Σάκχαρο", values);
 
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Σάκχαρο");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -632,11 +538,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         limit++;
                     }
                     msg = getString(R.string.helper_message_mes,"Παλμούς",values);
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Παλμοί");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -655,11 +561,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         }
                     }
                     msg = getString(R.string.helper_message_mes_cough,"Βήχα",coughCounter);
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Βήχα");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -682,11 +588,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         limit++;
                     }
                     msg = getString(R.string.helper_message_mes,"Οξυγόνο",values);
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes,"Οξυγόνο");
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
 
@@ -707,37 +613,37 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
                             String name = measurement.getString("name");
 
-                            if(name.equals("HR")){
+                            if(name.equals("Παλμοί")){
                                 if(hrCnt < 2){
                                     hr += measurement.getString("value")+ ", ";
                                     hrCnt++;
                                 }
                                 hrArray.put(measurement);
-                            }else if(name.equals("O2")){
+                            }else if(name.equals("Οξυγόνο")){
                                 if(oxCnt < 2){
                                     ox += measurement.getString("value")+"%, ";
                                     oxCnt++;
                                 }
                                 oxArray.put(measurement);
-                            }else if(name.equals("BP")){
+                            }else if(name.equals("Πίεση")){
                                 if(pressureCnt < 2){
                                     pressure += measurement.getString("value") + " υψηλή με ";
                                     pressure += measurement.getString("extraValue") + " χαμηλή, ";
                                     pressureCnt++;
                                 }
                                 pressureArray.put(measurement);
-                            }else if(name.equals("GLU")){
+                            }else if(name.equals("Σάκχαρο")){
                                 if(gluceCnt < 2){
                                     gluce += measurement.getString("value")+" ";
                                     gluce += measurement.getString("note")+", ";
                                     gluceCnt++;
                                 }
                                 gluceArray.put(measurement);
-                            }else if(name.equals("STR")){
+                            }else if(name.equals("Στρες")){
                                 stressTotal += Integer.parseInt(measurement.getString("value"));
                                 stressCnt++;
                                 stressArray.put(measurement);
-                            }else if(name.equals("CGH")){
+                            }else if(name.equals("Βήχας")){
                                 if(coughArray.length() < 3)
                                     coughArray.put(measurement);
                             }
@@ -773,11 +679,11 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         values += "\nΒήχας: " + cough;
                     }
                     msg = getString(R.string.helper_message_mes_general,values);
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_mes_total);
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }
                 break;
@@ -824,27 +730,19 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     try {
                         s = lastUnread.getJSONObject(0);
                         if(s.has("sender")) {
-                            if(unreadCnt == 1){
-                                msg = getString(R.string.helper_message_notifications_single, String.valueOf(unreadCnt), s.getString("sender"), s.getString("text"));
-                            }else {
-                                msg = getString(R.string.helper_message_notifications, String.valueOf(unreadCnt), s.getString("sender"), s.getString("text"));
-                            }
+                            msg = getString(R.string.helper_message_notifications, String.valueOf(unreadCnt), s.getString("sender"), s.getString("text"));
                         }else{
-                            if(unreadCnt == 1){
-                                msg = getString(R.string.helper_message_notifications_single, String.valueOf(unreadCnt),getString(R.string.smart_device),  getString(R.string.smart_device_message,s.getString("type"),String.valueOf(s.getInt("value"))));
-                            }else {
-                                msg = getString(R.string.helper_message_notifications, String.valueOf(unreadCnt),getString(R.string.smart_device),  getString(R.string.smart_device_message,s.getString("type"),String.valueOf(s.getInt("value"))));
-                            }
+                            msg = getString(R.string.helper_message_notifications, String.valueOf(unreadCnt),getString(R.string.smart_device),  getString(R.string.smart_device_message,s.getString("type"),String.valueOf(s.getInt("value"))));
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //message.setText(msg);
+                    message.setText(msg);
                     commandToSpeech(msg);
                 }else{
                     msg = getString(R.string.helper_message_no_notifications);
                 }
-                //message.setText(msg);
+                message.setText(msg);
                 commandToSpeech(msg);
                 break;
             case "notifications":
@@ -889,14 +787,13 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
         Log.i("unityCommand",""+command);
         if (command != null){
             try {
-                if(tempDir == null) {
+                if (tempDir == null) {
                     tempDir = getActivity().getCacheDir();
                 }
-                wavFile = File.createTempFile("speech", ".wav", tempDir);
+                wavFile = File.createTempFile("speech", "wav", tempDir);
                 Bundle params = new Bundle();
                 params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "");
                 tts.synthesizeToFile(text, params, wavFile, "id");
-                new Handler(Looper.getMainLooper()).post(() -> showText(text)); //show spannable text
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -906,7 +803,7 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
     private void getMessages(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_MESSAGES.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
@@ -926,11 +823,9 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         /*SharedPrefManager.getInstance(mContext).logout();
                         userLogin();*/
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
         ) {
@@ -960,8 +855,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             try {
@@ -978,11 +871,9 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         /*SharedPrefManager.getInstance(mContext).logout();
                         userLogin();*/
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
         ) {
@@ -1007,7 +898,7 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
 
     private void getMeasurements(String type,String action){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+startTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
         DateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+endTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -1026,8 +917,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         @Override
                         public void onResponse(String response) {
                             pd.hide();
-                            pd.cancel();
-
                             try {
                                 buildMsg(action,new JSONArray(response),null);
                             } catch (JSONException e) {
@@ -1040,11 +929,9 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             pd.hide();
-                            pd.cancel();
-
                             /*SharedPrefManager.getInstance(mContext).logout();
                             userLogin();*/
-                            Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                            Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -1070,6 +957,10 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+    }
+    @Override
+    public void onInit(int status) {
 
     }
 
@@ -1098,23 +989,6 @@ public class HelperFragment extends Fragment implements TextToSpeech.OnInitListe
             e.printStackTrace();
         }
         return new JSONArray(jsons);
-    }
-
-    private void showText(String text) {
-        int color = Color.parseColor("#AF000000");
-
-        int padding = 10; // in pixels
-        message.setShadowLayer(padding /* radius */, 0, 0, 0 /* transparent */);
-        message.setPadding(padding, padding, padding, padding);
-
-        Spannable spannable = new SpannableString(text);
-        spannable.setSpan(new PaddingBackgroundColorSpan(
-                color,
-                padding
-        ), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        message.setText(spannable);
-        message.bringToFront();
-
     }
 
     public void userLogin() {

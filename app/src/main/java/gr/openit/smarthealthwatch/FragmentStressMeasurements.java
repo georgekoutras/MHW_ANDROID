@@ -3,13 +3,11 @@ package gr.openit.smarthealthwatch;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
@@ -83,7 +81,6 @@ public class FragmentStressMeasurements extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    TextView stress_info_text;
     private FragmentMeasurements fm;
     private Context mContext;
     TextView title;
@@ -112,13 +109,11 @@ public class FragmentStressMeasurements extends Fragment {
     Map<Long,String> dataMap = new HashMap<>();
     ToggleButton dayNightBtn;
     JSONObject stressThres = new JSONObject();
-    UserHome uh;
 
-    public FragmentStressMeasurements(Context mContext, FragmentMeasurements fm, String displayDate, UserHome uh) {
+    public FragmentStressMeasurements(Context mContext, FragmentMeasurements fm, String displayDate) {
         this.mContext = mContext;
         this.fm = fm;
         this.displayDate = displayDate;
-        this.uh = uh;
         // Required empty public constructor
     }
     /**
@@ -131,7 +126,7 @@ public class FragmentStressMeasurements extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static FragmentStressMeasurements newInstance(String param1, String param2) {
-        FragmentStressMeasurements fragment = new FragmentStressMeasurements(null,null,null,null);
+        FragmentStressMeasurements fragment = new FragmentStressMeasurements(null,null,null);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -164,7 +159,7 @@ public class FragmentStressMeasurements extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (type.equals("STR")) {
+                if (type.equals("Στρες")) {
                     stressThres = s;
                     break;
                 }
@@ -176,7 +171,6 @@ public class FragmentStressMeasurements extends Fragment {
     public void onResume(){
         super.onResume();
         getMeasurements(false);
-        this.uh.showUnity();
     }
 
     @Override
@@ -189,7 +183,6 @@ public class FragmentStressMeasurements extends Fragment {
 
         stress_data = root.findViewById(R.id.total_stress_data);
         stress_level = root.findViewById(R.id.total_stress_level);
-        stress_info_text = root.findViewById(R.id.stress_info_text);
 
         title = root.findViewById(R.id.stress_body);
         prevDate = root.findViewById(R.id.prev_date);
@@ -245,7 +238,7 @@ public class FragmentStressMeasurements extends Fragment {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextSize(12f);
+        xAxis.setTextSize(10f);
         xAxis.setTextColor(Color.BLACK);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(true);
@@ -256,8 +249,6 @@ public class FragmentStressMeasurements extends Fragment {
 
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setTextSize(12f);
-
         leftAxis.setTextColor(Color.BLACK);
         leftAxis.setDrawGridLines(false);
         leftAxis.setGranularityEnabled(true);
@@ -297,15 +288,6 @@ public class FragmentStressMeasurements extends Fragment {
                 }
             }
         };
-
-        stress_info_text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://moodmetric.com/services/you/interpreting-data/"));
-                startActivity(browserIntent);
-            }
-
-        });
 
         date_field.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -406,7 +388,7 @@ public class FragmentStressMeasurements extends Fragment {
 
     public void getMeasurements(Boolean onRefresh){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+startTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
         DateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+endTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -415,7 +397,7 @@ public class FragmentStressMeasurements extends Fragment {
             String endForQuery = endDateFormat.format(dateFormat.parse(displayDate));
 
             String primaryUserInfoUrl = URLs.URL_GET_MEASUREMENT.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
-            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"STR";
+            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"Στρες";
             StringRequest stringRequest = new StringRequest(Request.Method.GET, primaryUserInfoUrl,
                     new Response.Listener<String>() {
                         @Override
@@ -431,8 +413,6 @@ public class FragmentStressMeasurements extends Fragment {
                                     stressBody.setVisibility(View.GONE);
                                 }
                                 pd.hide();
-                                pd.cancel();
-
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -444,8 +424,6 @@ public class FragmentStressMeasurements extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             pd.hide();
-                            pd.cancel();
-
                             SharedPrefManager.getInstance(mContext).logout();
                             userLogin();
                             //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -527,9 +505,9 @@ public class FragmentStressMeasurements extends Fragment {
 
         stress_data.setText(getString(R.string.stress_day_data,stress_total/stress_count));
         try {
-            if(stress_total/stress_count > Float.parseFloat(stressThres.getString("emergencyHigher"))){
+            if(stress_total/stress_count > Float.parseFloat(stressThres.getString("higher"))){
                 stress_level.setText(getString(R.string.stress_high));
-            }else if(stress_total/stress_count < Float.parseFloat(stressThres.getString("emergencyLower"))){
+            }else if(stress_total/stress_count < Float.parseFloat(stressThres.getString("lower"))){
                 stress_level.setText(getString(R.string.stress_low));
             }else{
                 stress_level.setText(getString(R.string.stress_normal));

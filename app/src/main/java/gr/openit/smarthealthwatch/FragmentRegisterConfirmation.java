@@ -72,10 +72,11 @@ public class FragmentRegisterConfirmation extends Fragment {
 
     private void loginTransition(){
         Fragment loginFragment = new LoginFragment(mContext);
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = ((MainActivity)mContext).getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
         transaction.replace(R.id.main_root,loginFragment); // give your fragment container id in first parameter
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         transaction.commit();
     }
 }

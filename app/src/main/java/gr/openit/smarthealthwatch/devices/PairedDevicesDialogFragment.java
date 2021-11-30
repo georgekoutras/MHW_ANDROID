@@ -1,5 +1,6 @@
 package gr.openit.smarthealthwatch.devices;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,11 +19,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import gr.openit.smarthealthwatch.GarminCustomService;
+import gr.openit.smarthealthwatch.MainActivity;
 import gr.openit.smarthealthwatch.R;
 import gr.openit.smarthealthwatch.UserHome;
 import gr.openit.smarthealthwatch.adapters.PairedDeviceListAdapter;
 import gr.openit.smarthealthwatch.pairing.ScanningDialogFragment;
+import gr.openit.smarthealthwatch.ui.DataDisplayActivity;
+import gr.openit.smarthealthwatch.util.Alarm;
 import gr.openit.smarthealthwatch.util.ConfirmationDialog;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
 
@@ -45,12 +48,12 @@ public class PairedDevicesDialogFragment extends DialogFragment implements Devic
 
     private PairedDeviceListAdapter mListAdapter;
     UserHome uh;
-    Context mContext;
-    public PairedDevicesDialogFragment(Context mContext, UserHome uh) {
+    private Alarm alarm;
+
+    public PairedDevicesDialogFragment( UserHome uh) {
         // Required empty public constructor
         super();
         this.uh = uh;
-        this.mContext = mContext;
     }
 
     @Nullable
@@ -58,45 +61,70 @@ public class PairedDevicesDialogFragment extends DialogFragment implements Devic
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
     {
         setRetainInstance(true);
-        View view = inflater.inflate(R.layout.fragment_paired_devices, container, false);
 
         DeviceManager deviceManager = DeviceManager.getDeviceManager();
-        if(deviceManager != null) {
-            List<Device> devices = new ArrayList<>(deviceManager.getPairedDevices());
+        List<Device> devices = new ArrayList<>(deviceManager.getPairedDevices());
 
+        View view = inflater.inflate(R.layout.fragment_paired_devices, container, false);
 
-            ListView mPairedDevicesList = view.findViewById(R.id.paired_devices_listview);
-            mListAdapter = new PairedDeviceListAdapter(getContext(), devices, new DeviceItemClickListener());
-            mPairedDevicesList.setAdapter(mListAdapter);
+        ListView mPairedDevicesList = view.findViewById(R.id.paired_devices_listview);
+        mListAdapter = new PairedDeviceListAdapter(getContext(), devices, new DeviceItemClickListener());
+        mPairedDevicesList.setAdapter(mListAdapter);
+        alarm = new Alarm();
+        alarm.setFragmentActivity(getActivity());
+        //On clicking the paired device, transition to the device sync screen
+/*        mPairedDevicesList.setOnItemClickListener((adapterView, v, i, l) ->
+        {
+            Device device = (Device)adapterView.getItemAtPosition(i);
 
-            //mPairedDevicesList.setOnItemLongClickListener((adapterView, view1, i, l) ->
-            mPairedDevicesList.setOnItemClickListener((adapterView, v, i, l) ->
+            Bundle bundle = new Bundle();
+            bundle.putString(DEVICE_ARG, device.address());
+            Intent intent = new Intent(PairedDevicesDialogFragment.this.getActivity(), DataDisplayActivity.class);
+            intent.putExtra(DEVICE_ADDRESS_EXTRA, device.address());
+            startActivity(intent);
+        });*/
+
+        //mPairedDevicesList.setOnItemLongClickListener((adapterView, view1, i, l) ->
+        mPairedDevicesList.setOnItemClickListener((adapterView, v, i, l) ->
+        {
+            Device device = (Device)adapterView.getItemAtPosition(i);
+            if(device.connectionState() != ConnectionState.CONNECTED)
             {
-                Device device = (Device) adapterView.getItemAtPosition(i);
-                if (device.connectionState() != ConnectionState.CONNECTED) {
-                    Toast.makeText(getContext(), "H συσκευή δεν είναι συνδεδεμένη", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                Toast.makeText(getContext(), "H συσκευή δεν είναι συνδεδεμένη", Toast.LENGTH_SHORT).show();
+                return ;
+            }
 
-                if (device.setupState() != SetupState.COMPLETE) {
-                    Toast.makeText(getContext(), "Η σύνδεση της συσκευής δεν ολοκληρώθηκε", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            if(device.setupState() != SetupState.COMPLETE)
+            {
+                Toast.makeText(getContext(), "Η σύνδεση της συσκευής δεν ολοκληρώθηκε", Toast.LENGTH_SHORT).show();
+                return ;
+            }
 
-                return;
-            });
+/*            DeviceDetailDialogFragment frag = new DeviceDetailDialogFragment();
+            Bundle args = new Bundle();
+            args.putString(DEVICE_ADDRESS_EXTRA, device.address());
+            frag.setArguments(args);*/
 
-            FloatingActionButton mAddDeviceButton = view.findViewById(R.id.add_device_button);
-            mAddDeviceButton.setOnClickListener(mAddButtonListener);
+/*            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            transaction.addToBackStack(null);
+            transaction.replace(R.id.main_container, frag, frag.getTag()).commit();*/
 
-            // if there are no paired devices, show an alert to begin the device scan
+            return ;
+        });
+
+        FloatingActionButton mAddDeviceButton = view.findViewById(R.id.add_device_button);
+        mAddDeviceButton.setOnClickListener(mAddButtonListener);
+
+        // if there are no paired devices, show an alert to begin the device scan
         /*if(devices.isEmpty())
         {
             ConfirmationDialog scanningConfirm = new ConfirmationDialog(getContext(), getString(R.string.scan_devices_title), getString(R.string.scan_devices_msg), getString(R.string.alert_dialog_ok),
                             getString(R.string.alert_dialog_cancel), new ScanningBeginClickListener());
             scanningConfirm.show();
         }*/
-        }
+
         return view;
     }
 
@@ -106,7 +134,7 @@ public class PairedDevicesDialogFragment extends DialogFragment implements Devic
         super.onResume();
         this.uh.hideMenu();
         this.uh.hideUnity();
-        //this.uh.toolbarTitleBack();
+        this.uh.toolbarTitleBack();
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
         DeviceManager.getDeviceManager().addConnectionStateListener(this);
@@ -193,14 +221,15 @@ public class PairedDevicesDialogFragment extends DialogFragment implements Devic
                     {
                         if (which == DialogInterface.BUTTON_POSITIVE)
                         {
-                            GarminCustomService gcService = new GarminCustomService();
-                            Intent gattServiceIntent = new Intent(mContext, gcService.getClass());
-                            gattServiceIntent.putExtra("stop_service",true);
-                            getActivity().startService(gattServiceIntent);
                             DeviceManager.getDeviceManager().forget(device.address());
                             mListAdapter.removeDevice(device.address());
                             SharedPrefManager.getInstance(getContext()).setGarminDeviceAddress(null);
-                            getActivity().stopService(gattServiceIntent);
+                            boolean alarmUp = (PendingIntent.getBroadcast(getContext(), 0,
+                                    new Intent(getContext(), Alarm.class),
+                                    PendingIntent.FLAG_NO_CREATE) != null);
+                            if (alarmUp) {
+                                alarm.cancelAlarm(getContext());
+                            }
                         }
                     });
             dialog.show();

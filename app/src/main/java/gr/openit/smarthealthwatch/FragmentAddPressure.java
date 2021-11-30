@@ -8,8 +8,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,11 +37,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import gr.openit.smarthealthwatch.util.Helpers;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
@@ -137,33 +132,11 @@ public class FragmentAddPressure extends Fragment {
         pressure_value_high = root.findViewById(R.id.mes_pressure_high);
         pressure_value_low = root.findViewById(R.id.mes_pressure_low);
 
-        pressure_value_low.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3, 1)});
-        pressure_value_high.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3, 1)});
-
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, new ArrayList<String>(Helpers.HOURS));
         hour.setAdapter(arrayAdapter);
 
         ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, new ArrayList<String>(Helpers.MINUTES));
         minutes.setAdapter(arrayAdapter1);
-
-        SimpleDateFormat timeF = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String []time = timeF.format(Calendar.getInstance().getTime()).split(":");
-
-        int hourPosition = arrayAdapter.getPosition(time[0]);
-        hour.setSelection(hourPosition);
-
-        if(Integer.parseInt(time[1]) % 5 == 0 ) {
-            int minutePosition = arrayAdapter1.getPosition(time[1]);
-            minutes.setSelection(minutePosition);
-        }else{
-            if(Integer.parseInt(time[1].substring(time[1].length() - 1)) > 5){
-                int minutePosition = arrayAdapter1.getPosition(time[1].substring(0, time[1].length() - 1) + "5");
-                minutes.setSelection(minutePosition);
-            }else {
-                int minutePosition = arrayAdapter1.getPosition(time[1].substring(0, time[1].length() - 1) + "0");
-                minutes.setSelection(minutePosition);
-            }
-        }
 
         DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -244,18 +217,7 @@ public class FragmentAddPressure extends Fragment {
                 }
 
                 if(!pressure_value_high.getText().toString().equals("") && !pressure_value_low.getText().toString().equals("")){
-                    double pres_high, pres_low;
-                    if(Double.parseDouble(pressure_value_high.getText().toString()) < 40){
-                        pres_high = Double.parseDouble(pressure_value_high.getText().toString()) * 10;
-                    }else{
-                        pres_high = Double.parseDouble(pressure_value_high.getText().toString());
-                    }
-                    if(Double.parseDouble(pressure_value_low.getText().toString()) < 40){
-                        pres_low = Double.parseDouble(pressure_value_low.getText().toString()) * 10;
-                    }else{
-                        pres_low = Double.parseDouble(pressure_value_low.getText().toString());
-                    }
-                    if(pres_high < pres_low) {
+                    if((Integer.parseInt(pressure_value_high.getText().toString()) < Integer.parseInt(pressure_value_low.getText().toString()) )) {
                         String errorString = "Η υψηλή πίεση δεν μπορεί να είναι μικρότερη απο τη χαμηλή.";
                         pressure_value_high.setError(errorString);
                         errorString = "Η χαμηλή πίεση δεν μπορεί να είναι μεγαλύτερη απο την υψηλή.";
@@ -271,9 +233,8 @@ public class FragmentAddPressure extends Fragment {
                 }
                 if(mAwesomeValidation.validate() && valid1 && valid2 && valid3) {
                     pd = new ProgressDialog(mContext);
-                    pd.setMessage(getString(R.string.please_wait));
+                    pd.setMessage("Παρακαλώ περιμένετε..");
                     pd.show();
-                    Helpers.hideKeyboard((MainActivity)getContext());
                     storePressure(displayDate,hour.getSelectedItem().toString().trim(),minutes.getSelectedItem().toString().trim(),pressure_value_high.getText().toString(),pressure_value_low.getText().toString());
                 }
             }
@@ -282,7 +243,6 @@ public class FragmentAddPressure extends Fragment {
 
         return root;
     }
-
 
     public void storePressure(String date, String hour, String minutes, String value_high,String value_low) {
         final JSONObject body = new JSONObject();
@@ -298,21 +258,10 @@ public class FragmentAddPressure extends Fragment {
             calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), Integer.parseInt(hour), Integer.parseInt(minutes), 0);
             String nowAsISO = df.format(new Date(calendar.getTimeInMillis()));
             //if everything is fine
-            double pres_high, pres_low;
-            if(Double.parseDouble(pressure_value_high.getText().toString()) < 40){
-                pres_high = Double.parseDouble(pressure_value_high.getText().toString()) * 10;
-            }else{
-                pres_high = Double.parseDouble(pressure_value_high.getText().toString());
-            }
-            if(Double.parseDouble(pressure_value_low.getText().toString()) < 40){
-                pres_low = Double.parseDouble(pressure_value_low.getText().toString()) * 10;
-            }else{
-                pres_low = Double.parseDouble(pressure_value_low.getText().toString());
-            }
             try {
-                body.put("name", "BP");
-                body.put("value", pres_high);
-                body.put("extraValue", pres_low);
+                body.put("name", "Πίεση");
+                body.put("value", Double.parseDouble(value_high));
+                body.put("extraValue", Double.parseDouble(value_low));
                 body.put("timeStamp", nowAsISO);
                 body.put("note",type);
             } catch (JSONException e) {
@@ -330,9 +279,7 @@ public class FragmentAddPressure extends Fragment {
                     public void onResponse(String response) {
                         //progressBar.setVisibility(View.GONE);
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext,getString(R.string.measurement_add_success), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,"Η μέτρηση προστέθηκε επιτυχώς", Toast.LENGTH_LONG).show();
                         getFragmentManager().popBackStackImmediate();
 
                     }
@@ -341,9 +288,7 @@ public class FragmentAddPressure extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(mContext, getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -371,19 +316,4 @@ public class FragmentAddPressure extends Fragment {
 
         VolleySingleton.getInstance(mContext).addToRequestQueue(stringRequest);
     }
-}
-
-class DecimalDigitsInputFilter implements InputFilter {
-    private Pattern mPattern;
-    DecimalDigitsInputFilter(int digitsBeforeZero, int digitsAfterZero) {
-        mPattern = Pattern.compile("[0-9]{0," + (digitsBeforeZero - 1) + "}+((\\.[0-9]{0," + (digitsAfterZero - 1) + "})?)||(\\.)?");
-    }
-    @Override
-    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-        Matcher matcher = mPattern.matcher(dest);
-        if (!matcher.matches())
-            return "";
-        return null;
-    }
-
 }

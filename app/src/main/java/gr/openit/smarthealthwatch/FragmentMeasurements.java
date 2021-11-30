@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -52,6 +54,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import gr.openit.smarthealthwatch.ui.BluetoothLeService;
+import gr.openit.smarthealthwatch.ui.MoodmetricServiceReceiver;
+import gr.openit.smarthealthwatch.util.Alarm;
 import gr.openit.smarthealthwatch.util.SharedPrefManager;
 import gr.openit.smarthealthwatch.util.URLs;
 import gr.openit.smarthealthwatch.util.VolleySingleton;
@@ -73,7 +78,7 @@ public class FragmentMeasurements extends Fragment {
     private String mParam1;
     private String mParam2;
     final Context mContext;
-    LinearLayout hr,pulseox, pressure,gluce,stress,cough;
+    RelativeLayout hr,pulseox, pressure,gluce,stress,cough;
     ImageView prevDate, nextDate;
     private View root;
     String displayDate;
@@ -135,6 +140,12 @@ public class FragmentMeasurements extends Fragment {
         //getUserMeasurements();
         this.uh.getUnreadMessages();
         this.uh.active = this;
+        PackageManager pm = mContext.getPackageManager();
+        Log.i("registeredReceivers",""+pm.queryBroadcastReceivers(new Intent(mContext, GarminHealthServiceReceiver.class),0));
+        Log.i("registeredReceivers",""+pm.queryBroadcastReceivers(new Intent(mContext, Alarm.class),0));
+        Log.i("registeredReceivers",""+pm.queryBroadcastReceivers(new Intent(mContext, MoodmetricServiceReceiver.class),0));
+
+
     }
     
     public boolean refresh(){
@@ -303,7 +314,7 @@ public class FragmentMeasurements extends Fragment {
 
     public void getThresholds(){
         ProgressDialog pd1 = new ProgressDialog(mContext);
-        pd1.setMessage(getString(R.string.please_wait));
+        pd1.setMessage("Παρακαλώ περιμένετε..");
         pd1.show();
         try {
             String primaryUserInfoUrl = URLs.URL_GET_THRESHOLDS.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
@@ -396,121 +407,119 @@ public class FragmentMeasurements extends Fragment {
 
     private void enableDisableMeasurements(){
         Set<String> monitorTypes = SharedPrefManager.getInstance(mContext).getUser().getMonitorTypes();
-        if(monitorTypes != null) {
-            if (!monitorTypes.contains("HR")) {
-                hr.setClickable(false);
-                hr.setFocusable(false);
-                hr.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                hr.findViewById(R.id.hr_more).setVisibility(View.GONE);
-                TextView hr_text = (TextView) hr.findViewById(R.id.hr_body);
-                hr_text.setText(R.string.not_active);
-                hrEnabled = false;
+        if(!monitorTypes.contains("Παλμοί")) {
+            hr.setClickable(false);
+            hr.setFocusable(false);
+            hr.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            hr.findViewById(R.id.hr_more).setVisibility(View.GONE);
+            TextView hr_text = (TextView)hr.findViewById(R.id.hr_body);
+            hr_text.setText(R.string.not_active);
+            hrEnabled = false;
 
-            } else {
-                hr.setClickable(true);
-                hr.setFocusable(true);
-                hr.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                hr.findViewById(R.id.hr_more).setVisibility(View.VISIBLE);
-                hrEnabled = true;
+        }else{
+            hr.setClickable(true);
+            hr.setFocusable(true);
+            hr.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            hr.findViewById(R.id.hr_more).setVisibility(View.VISIBLE);
+            hrEnabled = true;
 
-            }
+        }
 
-            if (!monitorTypes.contains("O2")) {
-                pulseox.setClickable(false);
-                pulseox.setFocusable(false);
-                pulseox.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                pulseox.findViewById(R.id.pulseox_more).setVisibility(View.GONE);
-                TextView pulseox_text = (TextView) pulseox.findViewById(R.id.pulseox_body);
-                pulseox_text.setText(R.string.not_active);
-                pulseEnabled = false;
+        if(!monitorTypes.contains("Οξυγόνο")) {
+            pulseox.setClickable(false);
+            pulseox.setFocusable(false);
+            pulseox.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            pulseox.findViewById(R.id.pulseox_more).setVisibility(View.GONE);
+            TextView pulseox_text = (TextView)pulseox.findViewById(R.id.pulseox_body);
+            pulseox_text.setText(R.string.not_active);
+            pulseEnabled = false;
 
-            } else {
-                pulseox.setClickable(true);
-                pulseox.setFocusable(true);
-                pulseox.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                pulseox.findViewById(R.id.pulseox_more).setVisibility(View.VISIBLE);
-                pulseEnabled = true;
-            }
+        }else{
+            pulseox.setClickable(true);
+            pulseox.setFocusable(true);
+            pulseox.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            pulseox.findViewById(R.id.pulseox_more).setVisibility(View.VISIBLE);
+            pulseEnabled = true;
+        }
 
-            if (!monitorTypes.contains("BP")) {
-                pressure.setClickable(false);
-                pressure.setFocusable(false);
-                pressure.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                pressure.findViewById(R.id.pressure_more).setVisibility(View.GONE);
-                TextView pressure_text = (TextView) pressure.findViewById(R.id.pressure_body);
-                pressure_text.setText(R.string.not_active);
-                pressureEnabled = false;
+        if(!monitorTypes.contains("Πίεση")) {
+            pressure.setClickable(false);
+            pressure.setFocusable(false);
+            pressure.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            pressure.findViewById(R.id.pressure_more).setVisibility(View.GONE);
+            TextView pressure_text = (TextView)pressure.findViewById(R.id.pressure_body);
+            pressure_text.setText(R.string.not_active);
+            pressureEnabled = false;
 
-            } else {
-                pressure.setClickable(true);
-                pressure.setFocusable(true);
-                pressure.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                pressure.findViewById(R.id.pressure_more).setVisibility(View.VISIBLE);
-                pressureEnabled = true;
+        }else{
+            pressure.setClickable(true);
+            pressure.setFocusable(true);
+            pressure.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            pressure.findViewById(R.id.pressure_more).setVisibility(View.VISIBLE);
+            pressureEnabled = true;
 
-            }
+        }
 
-            if (!monitorTypes.contains("STR")) {
-                stress.setClickable(false);
-                stress.setFocusable(false);
-                stress.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                stress.findViewById(R.id.stress_more).setVisibility(View.GONE);
-                TextView stress_text = (TextView) stress.findViewById(R.id.stress_body);
-                stress_text.setText(R.string.not_active);
-                stressEnabled = false;
+        if(!monitorTypes.contains("Στρες")) {
+            stress.setClickable(false);
+            stress.setFocusable(false);
+            stress.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            stress.findViewById(R.id.stress_more).setVisibility(View.GONE);
+            TextView stress_text = (TextView)stress.findViewById(R.id.stress_body);
+            stress_text.setText(R.string.not_active);
+            stressEnabled = false;
 
-            } else {
-                stress.setClickable(true);
-                stress.setFocusable(true);
-                stress.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                stress.findViewById(R.id.stress_more).setVisibility(View.VISIBLE);
-                stressEnabled = true;
+        }else{
+            stress.setClickable(true);
+            stress.setFocusable(true);
+            stress.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            stress.findViewById(R.id.stress_more).setVisibility(View.VISIBLE);
+            stressEnabled = true;
 
-            }
+        }
 
-            if (!monitorTypes.contains("GLU")) {
-                gluce.setClickable(false);
-                gluce.setFocusable(false);
-                gluce.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                gluce.findViewById(R.id.gluce_more).setVisibility(View.GONE);
-                TextView gluce_text = (TextView) gluce.findViewById(R.id.gluce_body);
-                gluce_text.setText(R.string.not_active);
-                gluceEnabled = false;
+        if(!monitorTypes.contains("Σάκχαρο")) {
+            gluce.setClickable(false);
+            gluce.setFocusable(false);
+            gluce.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            gluce.findViewById(R.id.gluce_more).setVisibility(View.GONE);
+            TextView gluce_text = (TextView)gluce.findViewById(R.id.gluce_body);
+            gluce_text.setText(R.string.not_active);
+            gluceEnabled = false;
 
-            } else {
-                gluce.setClickable(true);
-                gluce.setFocusable(true);
-                gluce.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                gluce.findViewById(R.id.gluce_more).setVisibility(View.VISIBLE);
-                gluceEnabled = true;
+        }else{
+            gluce.setClickable(true);
+            gluce.setFocusable(true);
+            gluce.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            gluce.findViewById(R.id.gluce_more).setVisibility(View.VISIBLE);
+            gluceEnabled = true;
 
-            }
+        }
 
-            if (!monitorTypes.contains("CGH")) {
-                cough.setClickable(false);
-                cough.setFocusable(false);
-                cough.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
-                cough.findViewById(R.id.cough_more).setVisibility(View.GONE);
-                TextView cough_text = (TextView) cough.findViewById(R.id.cough_body);
-                cough_text.setText(R.string.not_active);
-                cougheEnabled = false;
+        if(!monitorTypes.contains("Βήχας")) {
+            cough.setClickable(false);
+            cough.setFocusable(false);
+            cough.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape_greyd));
+            cough.findViewById(R.id.cough_more).setVisibility(View.GONE);
+            TextView cough_text = (TextView)cough.findViewById(R.id.cough_body);
+            cough_text.setText(R.string.not_active);
+            cougheEnabled = false;
 
-            } else {
-                cough.setClickable(true);
-                cough.setFocusable(true);
-                cough.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
-                cough.findViewById(R.id.cough_more).setVisibility(View.VISIBLE);
-                cougheEnabled = true;
-                CoughService coughService;
-                Intent gattServiceIntent;
-                coughService = new CoughService();
-                gattServiceIntent = new Intent(mContext, coughService.getClass());
-                getActivity().startService(gattServiceIntent);
-            }
+        }else{
+            cough.setClickable(true);
+            cough.setFocusable(true);
+            cough.setBackground(ContextCompat.getDrawable(mContext, R.drawable.border_shape));
+            cough.findViewById(R.id.cough_more).setVisibility(View.VISIBLE);
+            cougheEnabled = true;
+            CoughService coughService;
+            Intent gattServiceIntent;
+            coughService = new CoughService();
+            gattServiceIntent = new Intent(mContext, coughService.getClass());
+            getActivity().startService(gattServiceIntent);
         }
     }
     private void stressTransition(){
-        Fragment stressFragment = new FragmentStressMeasurements(mContext,this,displayDate,uh);
+        Fragment stressFragment = new FragmentStressMeasurements(mContext,this,displayDate);
         FragmentManager fm = ((MainActivity)mContext).getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
@@ -522,7 +531,7 @@ public class FragmentMeasurements extends Fragment {
     }
 
     private void coughTransition(){
-        Fragment coughFragment = new FragmentCoughMeasurements(mContext,this,displayDate,uh);
+        Fragment coughFragment = new FragmentCoughMeasurements(mContext,this,displayDate);
         FragmentManager fm = ((MainActivity)mContext).getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
@@ -534,7 +543,7 @@ public class FragmentMeasurements extends Fragment {
     }
 
     private void hrTransition(){
-        Fragment hrFragment = new FragmentHrMeasurements(mContext,this,displayDate,uh);
+        Fragment hrFragment = new FragmentHrMeasurements(mContext,this,displayDate);
         FragmentManager fm = ((MainActivity)mContext).getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
@@ -546,7 +555,7 @@ public class FragmentMeasurements extends Fragment {
     }
 
     private void pulseOxTransition(){
-        Fragment pulseoxFragment = new FragmentPulseoxMeasurements(mContext,this,displayDate,uh);
+        Fragment pulseoxFragment = new FragmentPulseoxMeasurements(mContext,this,displayDate);
         FragmentManager fm = ((MainActivity)mContext).getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
@@ -611,7 +620,7 @@ public class FragmentMeasurements extends Fragment {
     private void getUserMeasurements(){
 
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+startTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
         DateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+endTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -626,8 +635,6 @@ public class FragmentMeasurements extends Fragment {
                         @Override
                         public void onResponse(String response) {
                             pd.hide();
-                            pd.cancel();
-
                             try {
                                 JSONArray jsonArray = new JSONArray(response);
                                 showMeasurementsData(jsonArray);
@@ -640,8 +647,6 @@ public class FragmentMeasurements extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             pd.hide();
-                            pd.cancel();
-
                             SharedPrefManager.getInstance(mContext).logout();
                             userLogin();
                             //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -682,17 +687,17 @@ public class FragmentMeasurements extends Fragment {
                 for (int i = 0; i < data.length(); i++) {
                         JSONObject a = data.getJSONObject(i);
                         String type = a.getString("name");
-                        if(type.equals("HR")){
+                        if(type.equals("Παλμοί")){
                             hrData.put(a);
-                        }else if(type.equals("O2")){
+                        }else if(type.equals("Οξυγόνο")){
                             pulseData.put(a);
-                        }else if(type.equals("CGH")){
+                        }else if(type.equals("Βήχας")){
                             coughData.put(a);
-                        }else if(type.equals("BP")){
+                        }else if(type.equals("Πίεση")){
                             pressureData.put(a);
-                        }else if(type.equals("STR")){
+                        }else if(type.equals("Στρες")){
                             stressData.put(a);
-                        }else if(type.equals("GLU")){
+                        }else if(type.equals("Σάκχαρο")){
                             gluceData.put(a);
                         }
                 }
@@ -719,17 +724,17 @@ public class FragmentMeasurements extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if (type.equals("HR")) {
+                if (type.equals("Παλμοί")) {
                     hrThres = s;
-                } else if (type.equals("O2")) {
+                } else if (type.equals("Οξυγόνο")) {
                     pulseThres = s;
-                } else if (type.equals("CGH")) {
+                } else if (type.equals("Βήχας")) {
                     coughThres = s;
-                } else if (type.equals("BP")) {
+                } else if (type.equals("Πίεση")) {
                     pressureThres = s;
-                } else if (type.equals("STR")) {
+                } else if (type.equals("Στρες")) {
                     stressThres = s;
-                } else if (type.equals("GLU")) {
+                } else if (type.equals("Σάκχαρο")) {
                     gluceThres = s;
                 }
             }
@@ -806,18 +811,7 @@ public class FragmentMeasurements extends Fragment {
             }else {
                 title.setVisibility(View.VISIBLE);
                 title.setText(getString(R.string.no_measurements));
-                title_data.setVisibility(View.GONE);
-            }
-        }else{
-            if (hrData.length() > 0) {
-                hr.setClickable(true);
-                hr.setFocusable(true);
-                hr.findViewById(R.id.hr_activate).setVisibility(View.VISIBLE);
-            }else{
-                hr.setClickable(false);
-                hr.setFocusable(false);
-                hr.findViewById(R.id.hr_activate).setVisibility(View.GONE);
-            }
+                title_data.setVisibility(View.GONE);            }
         }
 
         if(pulseEnabled) {
@@ -888,16 +882,6 @@ public class FragmentMeasurements extends Fragment {
                 title.setText(getString(R.string.no_measurements));
                 title_data.setVisibility(View.GONE);
             }
-        }else{
-            if (pulseData.length() > 0) {
-                pulseox.setClickable(true);
-                pulseox.setFocusable(true);
-                pulseox.findViewById(R.id.pulseox_activate).setVisibility(View.VISIBLE);
-            }else{
-                pulseox.setClickable(false);
-                pulseox.setFocusable(false);
-                pulseox.findViewById(R.id.pulseox_activate).setVisibility(View.GONE);
-            }
         }
 
         if(cougheEnabled) {
@@ -916,16 +900,6 @@ public class FragmentMeasurements extends Fragment {
             } else {
                 title.setVisibility(View.VISIBLE);
                 title.setText(getString(R.string.no_measurements));
-            }
-        }else{
-            if (coughData.length() > 0) {
-                cough.setClickable(true);
-                cough.setFocusable(true);
-                cough.findViewById(R.id.cough_activate).setVisibility(View.VISIBLE);
-            }else{
-                cough.setClickable(false);
-                cough.setFocusable(false);
-                cough.findViewById(R.id.cough_activate).setVisibility(View.GONE);
             }
         }
 
@@ -1024,16 +998,6 @@ public class FragmentMeasurements extends Fragment {
                 title.setText(getString(R.string.no_measurements));
                 title_data.setVisibility(View.GONE);
             }
-        }else {
-            if (pressureData.length() > 0) {
-                pressure.setClickable(true);
-                pressure.setFocusable(true);
-                pressure.findViewById(R.id.pressure_activate).setVisibility(View.VISIBLE);
-            } else {
-                pressure.setClickable(false);
-                pressure.setFocusable(false);
-                pressure.findViewById(R.id.pressure_activate).setVisibility(View.GONE);
-            }
         }
 
         if(stressEnabled) {
@@ -1063,7 +1027,6 @@ public class FragmentMeasurements extends Fragment {
                         data_dash.setTextColor(Color.RED);
                         stressType = getString(R.string.stress_low);
                     }else{
-                        Log.i("stressThres",stressThres.length()+"");
                         data_dash.setTextColor(Color.BLACK);
                         stressType = getString(R.string.stress_normal);
                     }
@@ -1077,18 +1040,7 @@ public class FragmentMeasurements extends Fragment {
             } else {
                 title.setVisibility(View.VISIBLE);
                 title.setText(getString(R.string.no_measurements));
-                title_data.setVisibility(View.GONE);
-            }
-        }else {
-            if (stressData.length() > 0) {
-                stress.setClickable(true);
-                stress.setFocusable(true);
-                stress.findViewById(R.id.stress_activate).setVisibility(View.VISIBLE);
-            } else {
-                stress.setClickable(false);
-                stress.setFocusable(false);
-                stress.findViewById(R.id.stress_activate).setVisibility(View.GONE);
-            }
+                title_data.setVisibility(View.GONE);            }
         }
 
         if(gluceEnabled) {
@@ -1157,16 +1109,6 @@ public class FragmentMeasurements extends Fragment {
                 title.setVisibility(View.VISIBLE);
                 title.setText(getString(R.string.no_measurements));
                 title_data.setVisibility(View.GONE);
-            }
-        }else {
-            if (gluceData.length() > 0) {
-                gluce.setClickable(true);
-                gluce.setFocusable(true);
-                gluce.findViewById(R.id.gluce_activate).setVisibility(View.VISIBLE);
-            } else {
-                gluce.setClickable(false);
-                gluce.setFocusable(false);
-                gluce.findViewById(R.id.gluce_activate).setVisibility(View.GONE);
             }
         }
     }

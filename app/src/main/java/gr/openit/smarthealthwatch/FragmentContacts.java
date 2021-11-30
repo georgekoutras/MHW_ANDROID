@@ -172,7 +172,7 @@ public class FragmentContacts extends Fragment {
 
     private void getInvitations(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_INVITATIONS.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
@@ -194,11 +194,7 @@ public class FragmentContacts extends Fragment {
                                     invitations_title.setText(getString(R.string.all_contact_invitaions));
                                     invitations_border.setBackground(mContext.getResources().getDrawable(R.drawable.border_shape));
                                 } else {
-                                    if(new_invitations == 1){
-                                        invitations_title.setText(getString(R.string.new_contact_invitations_single, new_invitations));
-                                    }else{
-                                        invitations_title.setText(getString(R.string.new_contact_invitations, new_invitations));
-                                    }
+                                    invitations_title.setText(getString(R.string.new_contact_invitations, new_invitations));
                                     invitations_border.setBackground(mContext.getResources().getDrawable(R.drawable.border_shape_unread));
                                 }
                             }else{
@@ -216,8 +212,6 @@ public class FragmentContacts extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -246,7 +240,7 @@ public class FragmentContacts extends Fragment {
     private void getContacts(){
 /*
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 */
 
@@ -256,8 +250,6 @@ public class FragmentContacts extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             showContacts(jsonArray);
@@ -270,8 +262,6 @@ public class FragmentContacts extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();

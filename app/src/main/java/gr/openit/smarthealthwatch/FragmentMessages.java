@@ -122,7 +122,7 @@ public class FragmentMessages extends Fragment {
 
     public void getMessages(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         String primaryUserInfoUrl = URLs.URL_GET_MESSAGES.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
@@ -143,8 +143,6 @@ public class FragmentMessages extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -177,8 +175,6 @@ public class FragmentMessages extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         try {
                             JSONArray jsonArray = new JSONArray(response);
                             if(jsonArray.length() == 0 && messagesArray.length() == 0){
@@ -196,8 +192,6 @@ public class FragmentMessages extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
@@ -232,36 +226,11 @@ public class FragmentMessages extends Fragment {
             for (int i=0; i<dataAlerts.length(); i++) {
                 try {
                     JSONObject message = dataAlerts.getJSONObject(i);
+
                     String sender = getString(R.string.smart_device);
                     String id = String.valueOf(message.getInt("id"));
                     String time = message.getString("timeStamp");
-                    String type = message.getString("type");
                     Boolean read = message.getBoolean("seen");
-                    String preview = "";
-                    if(type.equals("BP")){
-                        preview += "Πίεση";
-                    }else if(type.equals("O2")){
-                        preview += "Οξυγόνο";
-                    }else if(type.equals("HR")){
-                        preview += "Παλμοί";
-                    }else if(type.equals("GLU")){
-                        preview += "Σάκχαρο";
-                    }else if(type.equals("STR")){
-                        preview += "Στρες";
-                    }else if(type.equals("CGH")){
-                        preview += "Βήχας";
-                    }
-                    preview += ": ";
-                    if(message.has("value")){
-                        preview += message.getString("value");
-                    }
-                    if(message.has("extraValue")){
-                        preview += ", "+ message.getString("extraValue");
-                    }
-                    preview += "\n" + message.getString("note");
-                    if(preview.length() > 40){
-                        preview = preview.substring(0,40)+"...";
-                    }
                     Date result1 = null;
                     String date = null;
                     try {
@@ -271,7 +240,7 @@ public class FragmentMessages extends Fragment {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    dataModels.add(new MessageRow(id,sender,date,preview,read, message, false));
+                    dataModels.add(new MessageRow(id,sender,date,read, message, false));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -288,10 +257,6 @@ public class FragmentMessages extends Fragment {
                     String id = String.valueOf(message.getInt("id"));
                     String time = message.getString("timeStamp");
                     Boolean read = message.getBoolean("read");
-                    String preview = message.getString("text");
-                    if(preview.length() > 40){
-                        preview = preview.substring(0,40)+"...";
-                    }
                     Date result1 = null;
                     String date = null;
                     try {
@@ -301,13 +266,16 @@ public class FragmentMessages extends Fragment {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                    dataModels.add(new MessageRow(id, sender, date, preview, read, message, true));
+                    dataModels.add(new MessageRow(id, sender, date, read, message, true));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
+        //dataModels.add(new AdviceRow("1","test"));
+        //dataModels.add(new AdviceRow("2","test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2"));
+        //dataModels.add(new AdviceRow("3","test3"));
 
         adapter= new ListMessagesAdapter(dataModels,mContext, uh, this);
         listView.setAdapter(adapter);

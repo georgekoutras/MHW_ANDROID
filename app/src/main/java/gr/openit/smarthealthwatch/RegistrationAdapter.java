@@ -154,17 +154,17 @@ public class RegistrationAdapter extends PagerAdapter {
 
                         monitorTypes = new ArrayList<String>();
                         if(hr.isChecked())
-                            monitorTypes.add("HR"); // you can save this as checked somewhere
+                            monitorTypes.add("Παλμοί"); // you can save this as checked somewhere
                         if(pressure.isChecked())
-                            monitorTypes.add("BP"); // you can save this as checked somewhere
+                            monitorTypes.add("Πίεση"); // you can save this as checked somewhere
                         if(pulseox.isChecked())
-                            monitorTypes.add("O2"); // you can save this as checked somewhere
+                            monitorTypes.add("Οξυγόνο"); // you can save this as checked somewhere
                         if(gluce.isChecked())
-                            monitorTypes.add("GLU"); // you can save this as checked somewhere
+                            monitorTypes.add("Σάκχαρο"); // you can save this as checked somewhere
                         if(cough.isChecked())
-                            monitorTypes.add("CGH"); // you can save this as checked somewhere
+                            monitorTypes.add("Βήχας"); // you can save this as checked somewhere
                         if(stress.isChecked())
-                            monitorTypes.add("STR"); // you can save this as checked somewhere
+                            monitorTypes.add("Στρες"); // you can save this as checked somewhere
 
                         register();
                     }
@@ -194,18 +194,18 @@ public class RegistrationAdapter extends PagerAdapter {
 
     private void register(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(mContext.getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         final JSONObject body = new JSONObject();
         JSONArray jsArray = new JSONArray(monitorTypes);
         try {
-            body.put("email", username.getText().toString().trim());
+            body.put("email", username.getText().toString());
             body.put("password", password.getText().toString());
-            body.put("firstName", first_name.getText().toString().trim());
-            body.put("lastName", last_name.getText().toString().trim());
+            body.put("firstName", first_name.getText().toString());
+            body.put("lastName", last_name.getText().toString());
             if(!TextUtils.isEmpty(year.getText().toString().trim())) {
-                body.put("birthYear", Integer.parseInt(year.getText().toString().trim()));
+                body.put("birthYear", Integer.parseInt(year.getText().toString()));
             }
             body.put("monitorTypes",jsArray);
         } catch (JSONException e) {
@@ -221,8 +221,6 @@ public class RegistrationAdapter extends PagerAdapter {
                     @Override
                     public void onResponse(String response) {
                         pd.hide();
-                        pd.cancel();
-
                         showRegisterConfirmation();
                     }
                 },
@@ -230,7 +228,6 @@ public class RegistrationAdapter extends PagerAdapter {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
 
                         if(error.networkResponse.statusCode == 400) {
                             Toast.makeText(mContext, new String(error.networkResponse.data, StandardCharsets.UTF_8), Toast.LENGTH_LONG).show();

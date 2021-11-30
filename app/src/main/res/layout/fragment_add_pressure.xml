@@ -185,7 +185,6 @@
                 android:inputType="numberDecimal"
                 android:background="@drawable/et_custom"
                 android:textSize="15sp" />
-            <!-- numberDecimal-->
         </LinearLayout>
         <Button
             android:id="@+id/btn_add_measurement"

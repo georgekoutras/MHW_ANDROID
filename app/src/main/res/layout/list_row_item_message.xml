@@ -49,16 +49,6 @@
             android:textColor="@color/black"
             android:textSize="12sp"
             android:layout_gravity="center_vertical"/>
-
-        <TextView
-            android:id="@+id/message_preview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="13sp"
-            android:textStyle="italic|bold"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="5dp"/>
     </LinearLayout>
     <ImageView
         android:layout_width="wrap_content"

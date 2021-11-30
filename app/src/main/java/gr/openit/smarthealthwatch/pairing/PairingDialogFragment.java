@@ -126,7 +126,6 @@ public class PairingDialogFragment extends DialogFragment {
 
             fragmentManager.popBackStack();
             fragmentManager.popBackStack();
-
         }
 
         @Override
@@ -163,7 +162,7 @@ public class PairingDialogFragment extends DialogFragment {
                 authCompletion.setPasskey(passkey);
             });
 
-            builder.setNegativeButton(R.string.alert_dialog_cancel, (dialog, which) -> dialog.cancel());
+            builder.setNegativeButton(R.string.button_cancel, (dialog, which) -> dialog.cancel());
 
             builder.show();
         }

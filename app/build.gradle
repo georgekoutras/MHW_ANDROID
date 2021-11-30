@@ -63,9 +63,6 @@ android {
 }
 repositories {
     maven {url "https://jitpack.io"}
-    maven {
-        url uri('mint-plugin-repo-5.2.5')
-    }
     flatDir {
         dirs 'libs'
     }
@@ -76,7 +73,6 @@ dependencies {
     }
     /*for stress chart*/
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.splunk:mint-android-sdk:5.2.5'
 
     //implementation 'com.android.volley:volley:1.1.1'
     implementation 'dev.dworks.libs:volleyplus:+'
@@ -102,14 +98,12 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-lite:3.0.1'
     implementation 'com.google.guava:guava:28.0-android'
     implementation 'net.danlew:android.joda:2.9.9.2'
-    implementation "androidx.room:room-runtime:2.2.5"
-    implementation "androidx.room:room-guava:2.2.5"
+    implementation "androidx.room:room-runtime:2.2.3"
+    implementation "androidx.room:room-guava:2.2.3"
     implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation 'com.github.tony19:logback-android:1.1.1-12'
     implementation 'net.zetetic:android-database-sqlcipher:4.3.0'
-    implementation project(':unityLibrary')//change
-    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + ('\\libs'), include: ['*.jar'])//change
-
+    //// END SDK DEPENDENCIES ////
 }
 
 // TASK TO UPDATE LICENSE DETAILS. DO NOT TOUCH

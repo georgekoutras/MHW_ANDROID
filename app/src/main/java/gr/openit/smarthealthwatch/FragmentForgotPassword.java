@@ -132,7 +132,7 @@ public class FragmentForgotPassword extends Fragment {
     private void resetPassword(String email){
         HttpsTrustManager.allowAllSSL();
         pd = new ProgressDialog(getContext());
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URLs.URL_RESET_PASSWORD,
@@ -142,8 +142,6 @@ public class FragmentForgotPassword extends Fragment {
                         //progressBar.setVisibility(View.GONE);
                         //Toast.makeText(getApplicationContext(), "response "+response, Toast.LENGTH_SHORT).show();
                         pd.hide();
-                        pd.cancel();
-
                         reset_form.setVisibility(View.GONE);
                         mailSent.setText(getString(R.string.email_reset_instructions,email));
                         mailSent.setVisibility(View.VISIBLE);
@@ -153,9 +151,7 @@ public class FragmentForgotPassword extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
-                        Toast.makeText(getContext(), getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Παρουσιάστηκε πρόβλημα. Παρακαλώ ελέγξτε τη σύνδεσή σας στο διαδύκτιο.", Toast.LENGTH_LONG).show();
                     }
                 }
 

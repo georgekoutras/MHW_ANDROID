@@ -72,6 +72,10 @@
         android:name="org.apache.http.legacy"
         android:required="false" />
 
+    <activity android:name="gr.openit.smarthealthwatch.ui.DataDisplayActivity"/>
+    <receiver android:name="gr.openit.smarthealthwatch.util.Alarm">
+    </receiver>
+
     <meta-data
             android:name="com.garmin.android.gncs.permission"
             android:value="${applicationId}.permission.RECEIVE_BROADCASTS"/>
@@ -92,20 +96,16 @@
             android:resource="@drawable/health_logo"/>
 
     <service android:name="com.garmin.health.GarminHealthService"
-        android:enabled="true"
-        android:process=":ghProcess"
-        tools:replace="android:enabled,android:process"/>
+             android:enabled="true"
+             android:process=":ghProcess"
+             tools:replace="android:enabled,android:process"/>
     <service android:name="com.garmin.android.gncs.GNCSListenerService"
-        android:enabled="true"
-        android:process=":ghProcess"
-        tools:replace="android:process"/>
+             android:process=":ghProcess"
+             tools:replace="android:process"/>
 
     <service android:name=".ui.BluetoothLeService"
              android:process=":ringProcess"
              android:enabled="true"/>
-    <service android:name=".GarminCustomService"
-        android:process=":garminCustomProcess"
-        android:enabled="true"/>
     <service android:name=".CoughService"
         android:process=":coughProcess"
         android:enabled="true"/>

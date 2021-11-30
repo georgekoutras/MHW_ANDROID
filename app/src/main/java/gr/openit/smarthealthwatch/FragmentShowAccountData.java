@@ -91,7 +91,7 @@ public class FragmentShowAccountData extends Fragment {
     public void onResume() {
         super.onResume();
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         getPrimaryUserInfo();
         this.uh.hideMenu();
@@ -163,42 +163,42 @@ public class FragmentShowAccountData extends Fragment {
     }
 
     public void showSelectedIndicators(List<String> list){
-        if(list.contains("HR")){
+        if(list.contains("Παλμοί")){
             ((ImageView)root.findViewById(R.id.hearrate_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.hearrate_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
             ((ImageView)root.findViewById(R.id.hearrate_valid)).setImageResource(R.drawable.ic_baseline_clear_24);
             ((ImageView)root.findViewById(R.id.hearrate_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_red_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        if(list.contains("O2")){
+        if(list.contains("Οξυγόνο")){
             ((ImageView)root.findViewById(R.id.pulseox_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.pulseox_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
             ((ImageView)root.findViewById(R.id.pulseox_valid)).setImageResource(R.drawable.ic_baseline_clear_24);
             ((ImageView)root.findViewById(R.id.pulseox_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_red_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        if(list.contains("STR")){
+        if(list.contains("Στρες")){
             ((ImageView)root.findViewById(R.id.stress_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.stress_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
             ((ImageView)root.findViewById(R.id.stress_valid)).setImageResource(R.drawable.ic_baseline_clear_24);
             ((ImageView)root.findViewById(R.id.stress_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_red_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        if(list.contains("CGH")){
+        if(list.contains("Βήχας")){
             ((ImageView)root.findViewById(R.id.cough_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.cough_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
             ((ImageView)root.findViewById(R.id.cough_valid)).setImageResource(R.drawable.ic_baseline_clear_24);
             ((ImageView)root.findViewById(R.id.cough_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_red_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        if(list.contains("BP")){
+        if(list.contains("Πίεση")){
             ((ImageView)root.findViewById(R.id.presure_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.presure_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
             ((ImageView)root.findViewById(R.id.presure_valid)).setImageResource(R.drawable.ic_baseline_clear_24);
             ((ImageView)root.findViewById(R.id.presure_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_red_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        if(list.contains("GLU")){
+        if(list.contains("Σάκχαρο")){
             ((ImageView)root.findViewById(R.id.glucometer_valid)).setImageResource(R.drawable.ic_baseline_check_24);
             ((ImageView)root.findViewById(R.id.glucometer_valid)).setColorFilter(ContextCompat.getColor(mContext, android.R.color.holo_green_dark), android.graphics.PorterDuff.Mode.MULTIPLY);
         }else{
@@ -218,8 +218,6 @@ public class FragmentShowAccountData extends Fragment {
 
                         primaryUserInfo = response;
                         pd.hide();
-                        pd.cancel();
-
                         showUserData();
                     }
                 },
@@ -227,8 +225,6 @@ public class FragmentShowAccountData extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         pd.hide();
-                        pd.cancel();
-
                         SharedPrefManager.getInstance(mContext).logout();
                         userLogin();
                         //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();

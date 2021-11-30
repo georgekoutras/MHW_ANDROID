@@ -125,7 +125,6 @@ public class FragmentGluceMeasurements extends Fragment {
         this.uh.setHasOptionsMenu(true);
         this.uh.showMenu();
         this.uh.active = this;
-        this.uh.showUnity();
     }
 
     @Override
@@ -300,7 +299,7 @@ public class FragmentGluceMeasurements extends Fragment {
 
     public void getMeasurements(){
         pd = new ProgressDialog(mContext);
-        pd.setMessage(getString(R.string.please_wait));
+        pd.setMessage("Παρακαλώ περιμένετε..");
         pd.show();
         DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+startTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
         DateFormat endDateFormat = new SimpleDateFormat("yyyy-MM-dd'T"+endTime+"'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -309,14 +308,12 @@ public class FragmentGluceMeasurements extends Fragment {
             String endForQuery = endDateFormat.format(dateFormat.parse(displayDate));
 
             String primaryUserInfoUrl = URLs.URL_GET_MEASUREMENT.replace("{id}",""+ SharedPrefManager.getInstance(mContext).getUser().getId());
-            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"GLU";
+            primaryUserInfoUrl += "?"+URLs.START_TIME+startForQuery+"&"+URLs.END_TIME+endForQuery+"&"+URLs.MEASUREMENT_TYPE+"Σάκχαρο";
             StringRequest stringRequest = new StringRequest(Request.Method.GET, primaryUserInfoUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             pd.hide();
-                            pd.cancel();
-
                             try {
                                 JSONArray jsonArray = new JSONArray(response);
 
@@ -338,8 +335,6 @@ public class FragmentGluceMeasurements extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             pd.hide();
-                            pd.cancel();
-
                             SharedPrefManager.getInstance(mContext).logout();
                             userLogin();
                             //Toast.makeText(mContext, "Παρουσιάστηκε σφάμλα! Παρακαλώ ελένξτε την σύνδεση σας στο διαδίκτυο.", Toast.LENGTH_LONG).show();
