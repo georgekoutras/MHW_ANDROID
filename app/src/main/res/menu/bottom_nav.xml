@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/metriseis"
+        android:icon="@drawable/icon_metriseis"
+        android:contentDescription="@string/menu_metriseis"
+        android:title="@string/menu_metriseis" />
+<!--    <item
+        android:id="@+id/deiktes"
+        android:icon="@drawable/icon_deiktes"
+        android:contentDescription="@string/menu_deiktes"
+        android:title="@string/menu_deiktes" />-->
+    <item
+        android:id="@+id/simvoules"
+        android:icon="@drawable/icon_simvoules"
+        android:contentDescription="@string/menu_simvoules"
+        android:title="@string/menu_simvoules" />
+    <item
+        android:id="@+id/minimata"
+        android:icon="@drawable/icon_minimata"
+        android:contentDescription="@string/menu_minimata"
+        android:title="@string/menu_minimata" />
+    <item
+        android:id="@+id/epafes"
+        android:icon="@drawable/icon_epafes"
+        android:contentDescription="@string/menu_epafes"
+        android:title="@string/menu_epafes" />
+</menu>

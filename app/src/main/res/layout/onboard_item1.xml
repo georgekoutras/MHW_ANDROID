@@ -1,0 +1,61 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <LinearLayout
+
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/item1_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingLeft="@dimen/ob_desc_padding"
+                    android:paddingRight="@dimen/ob_desc_padding"
+                    android:text="@string/item1_header"
+                    android:textColor="@color/onboard_header_color"
+                    android:textSize="@dimen/ob_header_text_size" />
+
+                <TextView
+                    android:id="@+id/item1_desc1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:gravity="left"
+                    android:paddingLeft="@dimen/ob_desc_padding"
+                    android:paddingRight="@dimen/ob_desc_padding"
+                    android:text="@string/item1_desc1"
+                    android:textColor="@color/ob_desc"
+                    android:textSize="@dimen/onboard_desc_text_size" />
+                <TextView
+                    android:id="@+id/item1_desc2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="left"
+                    android:paddingLeft="@dimen/ob_desc_padding"
+                    android:paddingRight="@dimen/ob_desc_padding"
+                    android:text="@string/item1_desc2"
+                    android:textColor="@color/ob_desc"
+                    android:textSize="@dimen/onboard_desc_text_size" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</ScrollView>

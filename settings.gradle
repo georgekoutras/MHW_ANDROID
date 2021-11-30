@@ -1,0 +1,3 @@
+include ':app'
+include ':unityLibrary', ':launcher'
+project(':unityLibrary').projectDir=new File("./unity/unityLibrary") //reference to module

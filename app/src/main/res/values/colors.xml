@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+-->
+    <color name="divider_color">#26000000</color>
+    <color name="grey_text_color">#606060</color>
+    <color name="dark_grey">#222222</color>
+    <color name="light_grey">#fafafa</color>
+    <color name="colorPrimary">#2D9CDB</color>
+    <color name="colorPrimaryAlpha">#2442bfe9</color>
+    <color name="colorPrimaryDark">#22817b</color>
+    <color name="colorPrimaryDarkAlpha">#902aa4e6</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorAccentAlpha">#110bc130</color>
+    <color name="colorVoid">#fecdcecd</color>
+    <color name="colorVoidDark">#fe929392</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!--OnBoard-->
+
+    <color name="selected_dot">#2D9CDB</color>
+    <color name="idle_dot">#662D9CDB</color>
+    <color name="ob_header">#4A4A4A</color>
+    <color name="ob_desc">#4A4A4A</color>
+    <color name="basic_color">#22817b</color>
+    <color name="onboard_header_color">#0cb2b0</color>
+
+    <color name="stressLow">#E8EC6D</color>
+    <color name="stressNormal">#339966</color>
+    <color name="stressHigh">#F6263B</color>
+
+    <array name="tab_colors">
+        <item name="tab_1">#22817b</item>
+        <item name="tab_2">#22817b</item>
+        <item name="tab_3">#22817b</item>
+        <item name="tab_4">#22817b</item>
+        <item name="tab_5">#22817b</item>
+    </array>
+</resources>

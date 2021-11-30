@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- TODO: This could be genericized by removing android:text so the caller
+     can set it dynamically. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:text="@string/settings"
+    android:drawableLeft="@drawable/ic_baseline_settings_24"
+    style="@style/Widget.AppCompat.ActionButton"
+
+    android:textSize="12sp"
+    android:textStyle="bold"
+    android:textColor="?attr/actionMenuTextColor"
+    android:focusable="true"
+    android:clickable="true"
+    />

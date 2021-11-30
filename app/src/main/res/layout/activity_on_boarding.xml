@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+>
+    <FrameLayout
+        android:id="@+id/ll_header"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="top"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="40dp">
+        <ImageView
+            android:id="@+id/header_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top|center"
+            android:paddingHorizontal="@dimen/btn_horizontal_margin"
+
+            android:scaleType="fitXY"
+            android:src="@drawable/logo_top" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/ll_header"
+        android:id="@+id/main_root_ob"
+        android:background="?android:windowBackground">
+        <gr.openit.smarthealthwatch.NonSwipableViewPager
+            android:id="@+id/pager_introduction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ll_nav" />
+
+        <!--    <LinearLayout
+                android:id="@+id/viewPagerCountDots"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/pager_height"
+                android:layout_above="@+id/ll_nav"
+                android:layout_marginBottom="12dp"
+                android:layout_alignParentLeft="true"
+                android:gravity="center"
+                android:orientation="horizontal" />-->
+        <FrameLayout
+            android:id="@+id/ll_nav"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_above="@+id/ll_footer"
+            >
+            <Button
+                android:id="@+id/intro_btn_prev"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/previous"
+                android:drawableLeft="@drawable/ic_baseline_chevron_left_24"
+                android:textSize="20sp"
+                android:background="@android:color/transparent"
+                android:drawableTint="@color/basic_color"
+                android:textColor="@color/basic_color"
+                android:visibility="gone"
+                android:layout_gravity="start|center"
+                android:paddingLeft="10sp"
+                android:drawableStart="@drawable/ic_baseline_chevron_left_24"
+                android:paddingStart="10sp" />
+            <Button
+                android:id="@+id/intro_btn_next"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next"
+                android:drawableRight="@drawable/ic_baseline_chevron_right_24"
+                android:textSize="20sp"
+                android:background="@android:color/transparent"
+                android:drawableTint="@color/basic_color"
+                android:textColor="@color/basic_color"
+                android:layout_gravity="end|center"
+                android:paddingRight="10sp"
+                android:paddingEnd="10sp"
+                android:drawableEnd="@drawable/ic_baseline_chevron_right_24" />
+            <!--<ImageButton
+                android:id="@+id/intro_btn_prev"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center"
+                android:padding="@dimen/activity_horizontal_margin"
+                android:src="@drawable/ic_baseline_chevron_left_24"
+                android:tint="@color/basic_color"
+                android:visibility="gone"/>-->
+
+            <!--<ImageButton
+                android:id="@+id/intro_btn_next"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center"
+                android:padding="@dimen/activity_horizontal_margin"
+                android:src="@drawable/ic_baseline_chevron_right_24"
+                android:tint="@color/basic_color" />-->
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/ll_footer"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_above="@+id/eu_erdf"
+            >
+
+            <Button
+                android:id="@+id/btn_get_started"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/register"
+                android:padding="@dimen/btn_horizontal_margin"
+                android:background="@drawable/default_button"
+                android:textColor="@color/white"
+                android:layout_gravity="center_vertical|center" />
+        </FrameLayout>
+        <FrameLayout
+            android:id="@+id/eu_erdf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true">
+
+            <ImageView
+                android:id="@+id/logo_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom|center"
+                android:scaleType="fitXY"
+                android:src="@drawable/eu_erdf_gr" />
+        </FrameLayout>
+    </RelativeLayout>
+</RelativeLayout>
+

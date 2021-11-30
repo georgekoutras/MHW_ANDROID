@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FragmentAdvices"
+    android:layout_marginTop="10dp">
+
+    <TextView
+        android:id="@+id/advices_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/advices_title"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_marginLeft="10dp"
+        />
+
+    <ListView
+        android:id="@+id/advices_measurements_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/advices_header"/>
+
+    <TextView
+        android:id="@+id/no_advices_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingStart="20dp"
+        android:layout_below="@id/advices_header"
+        android:text="@string/no_advices"
+        android:textSize="14sp"
+        android:visibility="gone"/>
+</RelativeLayout>

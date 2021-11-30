@@ -1,0 +1,131 @@
+<manifest xmlns:tools="http://schemas.android.com/tools" package="gr.openit.smarthealthwatch"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <uses-permission android:name="android.permission.BLUETOOTH" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+  <!-- Coarse Location for API <29 (Android 9 and lower) -->
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+  <!-- Fine Location for API >=29 (Android 10 and higher) -->
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+  <!-- (OPTIONAL) PERMISSIONS THAT ENABLE GENERAL SMART NOTIFICATIONS -->
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
+  <!-- Permission needed for Android Oreo call handling -->
+  <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
+
+  <!-- Permission needed to reject incoming phone calls -->
+  <uses-permission android:name="android.permission.CALL_PHONE"/>
+
+  <!-- Media Control Permission for Advanced Music Controls -->
+  <uses-permission android:name="android.Manifest.permission.MEDIA_CONTENT_CONTROL"/>
+
+  <!-- Foreground Permission required for newer Android SDKs -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+  <!-- /PERMISSIONS THAT ENABLE GENERAL NOTIFICATIONS -->
+
+  <!-- SDK Required Permission -->
+  <uses-permission android:name="${applicationId}.permission.RECEIVE_BROADCASTS" />
+
+  <permission
+          android:name="${applicationId}.permission.RECEIVE_BROADCASTS"
+          android:protectionLevel="normal" />
+  <application
+          android:name="gr.openit.smarthealthwatch.MyApplication"
+          android:allowBackup="false"
+          android:icon="@drawable/mhw_logo"
+          android:label="@string/app_name_sample"
+          android:roundIcon="@drawable/mhw_logo"
+          android:supportsRtl="true"
+          android:networkSecurityConfig="@xml/network_security_config"
+          android:usesCleartextTraffic="true"
+          android:theme="@style/AppTheme">
+    <activity android:name=".MainActivity"
+        android:screenOrientation = "portrait"
+        android:configChanges="orientation|screenSize|layoutDirection"
+        android:windowSoftInputMode="adjustPan"
+        android:launchMode="singleTask"
+        >
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <meta-data
+          android:name="unityplayer.UnityActivity"
+          android:value="true" />
+    </activity>
+
+    <uses-library
+        android:name="org.apache.http.legacy"
+        android:required="false" />
+
+    <meta-data
+            android:name="com.garmin.android.gncs.permission"
+            android:value="${applicationId}.permission.RECEIVE_BROADCASTS"/>
+    <meta-data
+            android:name="com.garmin.health.use_foreground_service"
+            android:value="true"/>
+    <meta-data
+            android:name="com.garmin.health.notification_channel_name"
+            android:value="Garmin Health Service"/>
+    <meta-data
+            android:name="com.garmin.health.notification_channel_description"
+            android:value="Channel for notification related to the Garmin Health SDK on Behalf of Partner Applications"/>
+    <meta-data
+            android:name="com.garmin.health.foreground_notification_title"
+            android:value="Garmin Health Service"/>
+    <meta-data
+            android:name="com.garmin.health.foreground_notification_icon"
+            android:resource="@drawable/health_logo"/>
+
+    <service android:name="com.garmin.health.GarminHealthService"
+        android:enabled="true"
+        android:process=":ghProcess"
+        tools:replace="android:enabled,android:process"/>
+    <service android:name="com.garmin.android.gncs.GNCSListenerService"
+        android:enabled="true"
+        android:process=":ghProcess"
+        tools:replace="android:process"/>
+
+    <service android:name=".ui.BluetoothLeService"
+             android:process=":ringProcess"
+             android:enabled="true"/>
+    <service android:name=".GarminCustomService"
+        android:process=":garminCustomProcess"
+        android:enabled="true"/>
+    <service android:name=".CoughService"
+        android:process=":coughProcess"
+        android:enabled="true"/>
+    <receiver
+        android:name=".ui.MoodmetricServiceReceiver"
+        android:enabled="true"
+        android:exported="true"
+        android:label="RestartRingServiceWhenStopped">
+    </receiver>
+    <meta-data
+        android:name="unity.build-id"
+        android:value="4f0297a8-da09-4f3a-8dfc-d6a22496e3fc" />
+    <meta-data
+        android:name="unity.splash-mode"
+        android:value="0" />
+    <meta-data
+        android:name="unity.splash-enable"
+        android:value="True" />
+
+
+  </application>
+
+</manifest>
